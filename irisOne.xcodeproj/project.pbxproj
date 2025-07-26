@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
+		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
+		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
+		BE6EBB8C2E33E7BA004F4D5A /* RelaxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB8B2E33E7BA004F4D5A /* RelaxViewController.swift */; };
+		BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB8D2E354904004F4D5A /* ActualChatViewController.swift */; };
+		BE6EBB902E354923004F4D5A /* ChatCategoryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB8F2E354922004F4D5A /* ChatCategoryData.swift */; };
+		BE6EBB922E354949004F4D5A /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */; };
+		BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */; };
+		BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */; };
+		BE6EBB982E355B65004F4D5A /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB972E355B64004F4D5A /* HomeViewController.swift */; };
 		BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339CD2E2FEF7D00D1C95C /* AppDelegate.swift */; };
 		BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */; };
 		BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339D12E2FEF7D00D1C95C /* ViewController.swift */; };
@@ -16,6 +26,7 @@
 		BE9339E52E2FEF8100D1C95C /* irisOneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339E42E2FEF8100D1C95C /* irisOneTests.swift */; };
 		BE9339EF2E2FEF8100D1C95C /* irisOneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */; };
 		BE9339F12E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */; };
+		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +47,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
+		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
+		BE6EBB8B2E33E7BA004F4D5A /* RelaxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelaxViewController.swift; sourceTree = "<group>"; };
+		BE6EBB8D2E354904004F4D5A /* ActualChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActualChatViewController.swift; sourceTree = "<group>"; };
+		BE6EBB8F2E354922004F4D5A /* ChatCategoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCategoryData.swift; sourceTree = "<group>"; };
+		BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
+		BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicatorCell.swift; sourceTree = "<group>"; };
+		BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryCardView.swift; sourceTree = "<group>"; };
+		BE6EBB972E355B64004F4D5A /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		BE9339CA2E2FEF7D00D1C95C /* irisOne.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = irisOne.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE9339CD2E2FEF7D00D1C95C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -49,6 +70,7 @@
 		BE9339EA2E2FEF8100D1C95C /* irisOneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = irisOneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITests.swift; sourceTree = "<group>"; };
 		BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +101,16 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */,
+				BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */,
+				BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */,
+				BE6EBB8D2E354904004F4D5A /* ActualChatViewController.swift */,
+				BE6EBB972E355B64004F4D5A /* HomeViewController.swift */,
+				BE6EBB8F2E354922004F4D5A /* ChatCategoryData.swift */,
+				BE6EBB8B2E33E7BA004F4D5A /* RelaxViewController.swift */,
+				BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */,
+				BE6EBB832E32F882004F4D5A /* ChatViewController.swift */,
+				BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */,
 				BE9339CC2E2FEF7D00D1C95C /* irisOne */,
 				BE9339E32E2FEF8100D1C95C /* irisOneTests */,
 				BE9339ED2E2FEF8100D1C95C /* irisOneUITests */,
@@ -103,6 +135,7 @@
 				BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */,
 				BE9339D12E2FEF7D00D1C95C /* ViewController.swift */,
 				BE9339D32E2FEF7D00D1C95C /* Main.storyboard */,
+				BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */,
 				BE9339D62E2FEF8000D1C95C /* Assets.xcassets */,
 				BE9339D82E2FEF8000D1C95C /* LaunchScreen.storyboard */,
 				BE9339DB2E2FEF8000D1C95C /* Info.plist */,
@@ -258,9 +291,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */,
+				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
+				BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */,
+				BE6EBB902E354923004F4D5A /* ChatCategoryData.swift in Sources */,
+				BE6EBB982E355B65004F4D5A /* HomeViewController.swift in Sources */,
+				BE6EBB922E354949004F4D5A /* ChatMessageCell.swift in Sources */,
+				BE6EBB8C2E33E7BA004F4D5A /* RelaxViewController.swift in Sources */,
+				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
+				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
+				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
+				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
