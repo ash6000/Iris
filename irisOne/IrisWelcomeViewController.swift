@@ -352,10 +352,18 @@ class IrisWelcomeViewController: UIViewController {
         let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         print("Starting with email: \(email)")
         
-        // Navigate to main app with custom tab bar
+        // Navigate to main app by replacing the root view controller
         let customTabBarController = CustomTabBarController()
-        customTabBarController.modalPresentationStyle = .fullScreen
-        present(customTabBarController, animated: true)
+        
+        // Get the window scene and replace the root view controller
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            
+            // Animate the transition
+            UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                window.rootViewController = customTabBarController
+            }, completion: nil)
+        }
     }
     
     private func updateStartButtonState() {

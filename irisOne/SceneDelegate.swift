@@ -61,10 +61,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        // Set CustomTabBarController as the root view controller
-        let customTabBarController = CustomTabBarController()
-        window?.rootViewController = customTabBarController
+        // TODO: Check for existing user authentication here
+        // For now, always show welcome screen
+        // In the future: if user is logged in, go directly to CustomTabBarController()
+        
+        let initialViewController = determineInitialViewController()
+        window?.rootViewController = initialViewController
         window?.makeKeyAndVisible()
+    }
+    
+    // MARK: - Helper Methods
+    private func determineInitialViewController() -> UIViewController {
+        // TODO: Add Firebase auth check here
+        // if Auth.auth().currentUser != nil {
+        //     return CustomTabBarController()
+        // } else {
+        //     return IrisWelcomeViewController()
+        // }
+        
+        // For now, always show welcome screen
+        return IrisWelcomeViewController()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
