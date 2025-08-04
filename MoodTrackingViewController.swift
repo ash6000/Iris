@@ -87,6 +87,7 @@ class MoodTrackingViewController: UIViewController {
     
     // Save Button
     private let saveButton = UIButton()
+    private let viewCalendarButton = UIButton()
     
     // Data
     private let moods = [
@@ -139,7 +140,7 @@ class MoodTrackingViewController: UIViewController {
         cleanupVoiceJournal()
     }
     
-    // MARK: - UI Setup
+
     private func setupUI() {
         view.backgroundColor = UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
         
@@ -162,6 +163,7 @@ class MoodTrackingViewController: UIViewController {
         setupJournalSection()
         setupTagsSection()
         setupWeeklyInsights()
+        setupViewCalendarButton()  // Add this line
         setupSaveButton()
     }
     
@@ -177,6 +179,44 @@ class MoodTrackingViewController: UIViewController {
         titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
         titleLabel.textAlignment = .center
         headerView.addSubview(titleLabel)
+    }
+    
+    @objc private func viewCalendarButtonTapped() {
+        print("📅 View Calendar & History button tapped")
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+        
+        // Create and push MoodOverviewViewController
+        let moodOverviewVC = MoodOverviewViewController()
+        navigationController?.pushViewController(moodOverviewVC, animated: true)
+    }
+    
+    private func setupViewCalendarButton() {
+        viewCalendarButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Style the button to match app theme
+        viewCalendarButton.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 1.0)
+        viewCalendarButton.layer.cornerRadius = 20
+        viewCalendarButton.layer.cornerCurve = .continuous
+        
+        // Add subtle shadow for depth
+        viewCalendarButton.layer.shadowColor = UIColor.black.cgColor
+        viewCalendarButton.layer.shadowOpacity = 0.05
+        viewCalendarButton.layer.shadowRadius = 4
+        viewCalendarButton.layer.shadowOffset = CGSize(width: 0, height: 2)
+        
+        // Button content
+        viewCalendarButton.setTitle("📅 View Calendar & History", for: .normal)
+        viewCalendarButton.setTitleColor(UIColor(red: 0.4, green: 0.3, blue: 0.3, alpha: 1.0), for: .normal)
+        viewCalendarButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        
+        // Add target action
+        viewCalendarButton.addTarget(self, action: #selector(viewCalendarButtonTapped), for: .touchUpInside)
+        
+        // Add to content view
+        contentView.addSubview(viewCalendarButton)
     }
     
     private func setupStreakBanner() {
@@ -746,7 +786,8 @@ class MoodTrackingViewController: UIViewController {
         contentView.addSubview(saveButton)
     }
     
-    // MARK: - Constraints
+
+    // MARK: - Complete setupConstraints method
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // Scroll View
@@ -935,7 +976,7 @@ class MoodTrackingViewController: UIViewController {
             collapseHandle.heightAnchor.constraint(equalToConstant: 20),
             
             // Weekly Insights
-            insightsCard.topAnchor.constraint(equalTo: journalCard.bottomAnchor, constant: 16),
+            insightsCard.topAnchor.constraint(equalTo: viewCalendarButton.bottomAnchor, constant: 16), // Changed to be below calendar button
             insightsCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             insightsCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -947,8 +988,14 @@ class MoodTrackingViewController: UIViewController {
             insightsStackView.trailingAnchor.constraint(equalTo: insightsCard.trailingAnchor, constant: -16),
             insightsStackView.bottomAnchor.constraint(equalTo: insightsCard.bottomAnchor, constant: -20),
             
-            // Save Button
-            saveButton.topAnchor.constraint(equalTo: insightsCard.bottomAnchor, constant: 24),
+            // View Calendar & History Button (positioned ABOVE Weekly Insights)
+            viewCalendarButton.topAnchor.constraint(equalTo: journalCard.bottomAnchor, constant: 16), // Changed to be after journal card
+            viewCalendarButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            viewCalendarButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            viewCalendarButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Save Button (now positioned below Weekly Insights)
+            saveButton.topAnchor.constraint(equalTo: insightsCard.bottomAnchor, constant: 16), // Changed back to insights card
             saveButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             saveButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             saveButton.heightAnchor.constraint(equalToConstant: 50),

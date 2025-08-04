@@ -17,6 +17,8 @@
 		BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */; };
 		BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */; };
 		BE6EBB982E355B65004F4D5A /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB972E355B64004F4D5A /* HomeViewController.swift */; };
+		BE6EBB9A2E36A8B2004F4D5A /* ImmersiveChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */; };
+		BE6EBBB62E3D13E0004F4D5A /* MoodOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBBB52E3D13DF004F4D5A /* MoodOverviewViewController.swift */; };
 		BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339CD2E2FEF7D00D1C95C /* AppDelegate.swift */; };
 		BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */; };
 		BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339D12E2FEF7D00D1C95C /* ViewController.swift */; };
@@ -57,6 +59,8 @@
 		BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicatorCell.swift; sourceTree = "<group>"; };
 		BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryCardView.swift; sourceTree = "<group>"; };
 		BE6EBB972E355B64004F4D5A /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveChatViewController.swift; sourceTree = "<group>"; };
+		BE6EBBB52E3D13DF004F4D5A /* MoodOverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodOverviewViewController.swift; sourceTree = "<group>"; };
 		BE9339CA2E2FEF7D00D1C95C /* irisOne.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = irisOne.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE9339CD2E2FEF7D00D1C95C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +105,7 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */,
 				BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */,
 				BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */,
 				BE6EBB952E355B35004F4D5A /* CategoryCardView.swift */,
@@ -109,6 +114,7 @@
 				BE6EBB8F2E354922004F4D5A /* ChatCategoryData.swift */,
 				BE6EBB8B2E33E7BA004F4D5A /* RelaxViewController.swift */,
 				BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */,
+				BE6EBBB52E3D13DF004F4D5A /* MoodOverviewViewController.swift */,
 				BE6EBB832E32F882004F4D5A /* ChatViewController.swift */,
 				BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */,
 				BE9339CC2E2FEF7D00D1C95C /* irisOne */,
@@ -291,6 +297,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE6EBBB62E3D13E0004F4D5A /* MoodOverviewViewController.swift in Sources */,
 				BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */,
 				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
@@ -302,6 +309,7 @@
 				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
 				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
+				BE6EBB9A2E36A8B2004F4D5A /* ImmersiveChatViewController.swift in Sources */,
 				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,

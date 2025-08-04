@@ -42,23 +42,29 @@ class CustomTabBarController: UIViewController {
     private func setupViewControllers() {
         // Home tab - Now uses ChatViewController
         let homeVC = ChatViewController()
+        //let homeVC = IrisWelcomeViewController()
         homeVC.customTabBarController = self
         homeNavigationController = UINavigationController(rootViewController: homeVC)
         homeNavigationController.isNavigationBarHidden = true
+       // homeNavigationController.isToolbarHidden = true
 
         // Mood tab
         let moodVC = MoodTrackingViewController()
         moodNavigationController = UINavigationController(rootViewController: moodVC)
+        moodNavigationController.isNavigationBarHidden = true
         
         // Relax tab
         let relaxVC = RelaxViewController()
         relaxNavigationController = UINavigationController(rootViewController: relaxVC)
+        relaxNavigationController.isNavigationBarHidden = true
 
         // Reflect tab - Placeholder for now
         reflectNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "Reflect Coming Soon", color: .systemPink))
+        reflectNavigationController.isNavigationBarHidden = true
         
         // More tab
         moreNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "More Options", color: .systemOrange))
+        moreNavigationController.isNavigationBarHidden = true
     }
     
     private func createPlaceholderVC(title: String, color: UIColor) -> UIViewController {
@@ -146,10 +152,14 @@ class CustomTabBarController: UIViewController {
     }
     
     @objc private func tabButtonTapped(_ sender: TabButton) {
+        print("Tab button tapped: \(sender.tag)")
         selectTab(at: sender.tag)
     }
     
     func selectTab(at index: Int) {
+        // If immersive view is showing, dismiss it first
+        dismissImmersiveChat()
+        
         // Handle Home tab re-selection to go back to category list
         if index == selectedTabIndex && index == 0 && currentViewController != nil {
             // Pop to root view controller in home navigation
@@ -265,5 +275,105 @@ class TabButton: UIButton {
         let color = selected ? selectedColor : unselectedColor
         iconImageView.tintColor = color
         customTitleLabel.textColor = color
+    }
+}
+
+// MARK: - Extension with Helper Methods
+extension CustomTabBarController {
+    
+    // MARK: - Public Tab Selection Methods
+    func selectHomeTab() {
+        selectTab(at: 0)
+    }
+    
+    func selectMoodTab() {
+        selectTab(at: 1)
+    }
+    
+    func selectRelaxTab() {
+        selectTab(at: 2)
+    }
+    
+    func selectReflectTab() {
+        selectTab(at: 3)
+    }
+    
+    func selectMoreTab() {
+        selectTab(at: 4)
+    }
+    
+    // MARK: - Immersive View Integration
+    func presentImmersiveChatForCategory(_ category: ChatCategoryData, messages: [ChatMessage] = []) {
+        // First dismiss any existing immersive view
+        dismissImmersiveChat()
+        
+        let immersiveVC = ImmersiveChatViewController(
+            category: category,
+            messages: messages,
+            customTabBarController: self
+        )
+        
+        // Add as child view controller
+        addChild(immersiveVC)
+        
+        // Add to the content container area ONLY (not over the tab bar)
+        contentContainerView.addSubview(immersiveVC.view)
+        immersiveVC.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            immersiveVC.view.topAnchor.constraint(equalTo: contentContainerView.topAnchor),
+            immersiveVC.view.leadingAnchor.constraint(equalTo: contentContainerView.leadingAnchor),
+            immersiveVC.view.trailingAnchor.constraint(equalTo: contentContainerView.trailingAnchor),
+            immersiveVC.view.bottomAnchor.constraint(equalTo: contentContainerView.bottomAnchor)
+        ])
+        
+        // Hide the current tab content (but keep tab bar visible)
+        currentViewController?.view.isHidden = true
+        
+        // Animate in
+        immersiveVC.view.alpha = 0
+        UIView.animate(withDuration: 0.3) {
+            immersiveVC.view.alpha = 1
+        }
+        
+        immersiveVC.didMove(toParent: self)
+    }
+    
+    func dismissImmersiveChat() {
+        if let immersiveVC = children.first(where: { $0 is ImmersiveChatViewController }) {
+            // Show the tab content again
+            currentViewController?.view.isHidden = false
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                immersiveVC.view.alpha = 0
+            }) { _ in
+                immersiveVC.willMove(toParent: nil)
+                immersiveVC.view.removeFromSuperview()
+                immersiveVC.removeFromParent()
+            }
+        }
+    }
+    
+    // MARK: - Enhanced Tab Selection with Immersive Handling
+    func selectTabDismissingImmersive(at index: Int) {
+        // If immersive view is showing, dismiss it first
+        dismissImmersiveChat()
+        
+        // Then proceed with normal tab selection
+        selectTab(at: index)
+    }
+    
+    // MARK: - Navigation Helpers
+    func popToHomeRoot() {
+        selectTab(at: 0)
+        homeNavigationController.popToRootViewController(animated: true)
+    }
+    
+    func getCurrentTabIndex() -> Int {
+        return selectedTabIndex
+    }
+    
+    func getCurrentViewController() -> UIViewController? {
+        return currentViewController
     }
 }

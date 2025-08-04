@@ -13,7 +13,6 @@ class ChatViewController: UIViewController {
     private let irisIconView = UIView()
     private let irisIconImageView = UIImageView()
     private let titleLabel = UILabel()
-    private let subtitleLabel = UILabel()
     private let categoryStackView = UIStackView()
     private let footerLabel = UILabel()
     
@@ -82,7 +81,7 @@ class ChatViewController: UIViewController {
         ChatCategoryData(
             title: "Forgiveness & Letting Go",
             subtitle: "Release and heal",
-            iconName: "dove.fill",
+            iconName: "wind",
             backgroundColor: UIColor(red: 0.5, green: 0.7, blue: 0.8, alpha: 1.0)
         ),
         ChatCategoryData(
@@ -140,21 +139,12 @@ class ChatViewController: UIViewController {
         
         // Title - Slightly smaller for grid layout
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Hi, I’m Iris. What’s been\n on your mind "
+        titleLabel.text = "Hi, I'm Iris. What's been\n on your mind?"
         titleLabel.font = UIFont(name: "Georgia", size: 24) ?? UIFont.systemFont(ofSize: 24, weight: .bold)
         titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 2
         headerView.addSubview(titleLabel)
-        
-        // Subtitle - Slightly smaller for grid layout
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.text = "Choose a category to begin your\nreflection journey"
-        subtitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        subtitleLabel.textColor = UIColor(red: 0.7, green: 0.5, blue: 0.6, alpha: 1.0)  // Mauve purple color
-        subtitleLabel.textAlignment = .center
-        subtitleLabel.numberOfLines = 2
-        headerView.addSubview(subtitleLabel)
     }
     
     private func setupCategoryGrid() {
@@ -216,7 +206,7 @@ class ChatViewController: UIViewController {
         iconImageView.contentMode = .scaleAspectFit
         iconContainer.addSubview(iconImageView)
         
-        // Title - Slightly larger font, better spacing
+        // Title - Centered and larger since no subtitle
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = category.title
@@ -227,21 +217,9 @@ class ChatViewController: UIViewController {
         titleLabel.lineBreakMode = .byWordWrapping
         cardView.addSubview(titleLabel)
         
-        // Subtitle - Gray color, better spacing
-        let subtitleLabel = UILabel()
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.text = category.subtitle
-        subtitleLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        subtitleLabel.textColor = UIColor(red: 0.7, green: 0.5, blue: 0.6, alpha: 1.0)
-
-        subtitleLabel.numberOfLines = 2  // Allow 2 lines for subtitle
-        subtitleLabel.textAlignment = .center
-        subtitleLabel.lineBreakMode = .byWordWrapping
-        cardView.addSubview(subtitleLabel)
-        
-        // Constraints - Larger card with better spacing
+        // Constraints - Adjusted for no subtitle
         NSLayoutConstraint.activate([
-            cardView.heightAnchor.constraint(equalToConstant: 160), // Increased height for more space
+            cardView.heightAnchor.constraint(equalToConstant: 140), // Reduced height since no subtitle
             
             // Icon at TOP - perfect circle, larger
             iconContainer.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16),
@@ -254,16 +232,11 @@ class ChatViewController: UIViewController {
             iconImageView.widthAnchor.constraint(equalToConstant: 24),  // Larger icon
             iconImageView.heightAnchor.constraint(equalToConstant: 24),
             
-            // Title below icon with more space
+            // Title below icon with more space - centered vertically in remaining space
             titleLabel.topAnchor.constraint(equalTo: iconContainer.bottomAnchor, constant: 12),
             titleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
             titleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -8),
-            
-            // Subtitle below title with proper spacing
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            subtitleLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
-            subtitleLabel.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -8),
-            subtitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -16)
+            titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -16)
         ])
         
         // Add tap gesture
@@ -299,7 +272,7 @@ class ChatViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Header View - More compact for grid
+            // Header View - More compact since no subtitle
             headerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
@@ -315,23 +288,18 @@ class ChatViewController: UIViewController {
             irisIconImageView.trailingAnchor.constraint(equalTo: irisIconView.trailingAnchor),
             irisIconImageView.bottomAnchor.constraint(equalTo: irisIconView.bottomAnchor),
             
-            // Title - Tighter spacing
+            // Title - No subtitle, so this is the bottom of header
             titleLabel.topAnchor.constraint(equalTo: irisIconView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor),
-            
-            // Subtitle - Tighter spacing
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            subtitleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor),
-            subtitleLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor),
-            subtitleLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
+            titleLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
             
             // Category Stack View - Better spacing for larger cards
             categoryStackView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 28),
             categoryStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            // Footer - Proper spacing from larger grid
+            // Footer - Proper spacing from grid
             footerLabel.topAnchor.constraint(equalTo: categoryStackView.bottomAnchor, constant: 32),
             footerLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             footerLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
@@ -352,8 +320,9 @@ class ChatViewController: UIViewController {
             }
         }
         
-        // Navigate to actual chat view
+        // Navigate to actual chat view - UPDATED to pass customTabBarController reference
         let actualChatVC = ActualChatViewController(category: selectedCategory)
+        actualChatVC.customTabBarController = customTabBarController
         navigationController?.pushViewController(actualChatVC, animated: true)
     }
 }
