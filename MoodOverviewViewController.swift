@@ -1127,13 +1127,16 @@ extension MoodOverviewViewController: UICollectionViewDelegateFlowLayout {
             print("Navigate to mood detail for: \(moodEntry.moodLabel) on \(moodEntry.dateString)")
             
             // TODO: Push to MoodDetailViewController
-            let alert = UIAlertController(
-                title: "\(moodEntry.emoji) \(moodEntry.moodLabel)",
-                message: "\(moodEntry.dateString)\n\n\(moodEntry.journalText)\n\nTags: \(moodEntry.tags.joined(separator: ", "))",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
+//            let alert = UIAlertController(
+//                title: "\(moodEntry.emoji) \(moodEntry.moodLabel)",
+//                message: "\(moodEntry.dateString)\n\n\(moodEntry.journalText)\n\nTags: \(moodEntry.tags.joined(separator: ", "))",
+//                preferredStyle: .alert
+//            )
+//            alert.addAction(UIAlertAction(title: "OK", style: .default))
+//            present(alert, animated: true)
+//            
+//            let detailVC = MoodEntryDetailViewController(moodEntry: moodEntry)
+//                   navigationController?.pushViewController(detailVC, animated: true)
         }
     }
 }
@@ -1359,13 +1362,16 @@ extension MoodOverviewViewController: UITableViewDelegate {
         // Navigate to MoodDetailViewController (simulate for now)
         print("Navigate to mood detail for: \(moodEntry.moodLabel)")
         
-        let alert = UIAlertController(
-            title: "\(moodEntry.emoji) \(moodEntry.moodLabel)",
-            message: "\(moodEntry.dateString)\n\n\(moodEntry.journalText)\n\nTags: \(moodEntry.tags.joined(separator: ", "))",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+//        let alert = UIAlertController(
+//            title: "\(moodEntry.emoji) \(moodEntry.moodLabel)",
+//            message: "\(moodEntry.dateString)\n\n\(moodEntry.journalText)\n\nTags: \(moodEntry.tags.joined(separator: ", "))",
+//            preferredStyle: .alert
+//        )
+//        alert.addAction(UIAlertAction(title: "OK", style: .default))
+//        present(alert, animated: true)
+        
+        let detailVC = MoodEntryDetailViewController(moodEntry: moodEntry)
+               navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 

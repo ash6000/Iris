@@ -29,6 +29,7 @@
 		BE9339EF2E2FEF8100D1C95C /* irisOneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */; };
 		BE9339F12E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */; };
 		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
+		BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 		BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITests.swift; sourceTree = "<group>"; };
 		BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
+		BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +107,7 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */,
 				BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */,
 				BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */,
 				BE6EBB932E354976004F4D5A /* TypingIndicatorCell.swift */,
@@ -299,6 +302,7 @@
 			files = (
 				BE6EBBB62E3D13E0004F4D5A /* MoodOverviewViewController.swift in Sources */,
 				BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */,
+				BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */,
 				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
 				BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */,
