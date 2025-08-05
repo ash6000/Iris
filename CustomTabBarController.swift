@@ -63,8 +63,11 @@ class CustomTabBarController: UIViewController {
         reflectNavigationController.isNavigationBarHidden = true
         
         // More tab
-        moreNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "More Options", color: .systemOrange))
+        let moreVc = SettingsViewController()
+        moreNavigationController = UINavigationController(rootViewController: moreVc)
         moreNavigationController.isNavigationBarHidden = true
+        //moreNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "More Options", color: .systemOrange))
+       // moreNavigationController.isNavigationBarHidden = true
     }
     
     private func createPlaceholderVC(title: String, color: UIColor) -> UIViewController {

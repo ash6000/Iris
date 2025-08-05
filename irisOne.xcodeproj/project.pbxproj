@@ -30,6 +30,7 @@
 		BE9339F12E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */; };
 		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
 		BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */; };
+		BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105292E411CBA00235A60 /* SettingsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
 		BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailViewController.swift; sourceTree = "<group>"; };
+		BED105292E411CBA00235A60 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BED105292E411CBA00235A60 /* SettingsViewController.swift */,
 				BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */,
 				BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */,
 				BE6EBB912E354949004F4D5A /* ChatMessageCell.swift */,
@@ -317,6 +320,7 @@
 				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
+				BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
