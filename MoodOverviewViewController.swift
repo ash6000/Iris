@@ -138,12 +138,7 @@ class MoodOverviewViewController: UIViewController {
         // Force layout update to ensure proper sizing
         forceLayoutUpdate()
         
-        // Test switching to history tab after layout is complete
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            print("🔄 Delayed check - switching to history tab for test")
-            self.segmentedControl.selectedSegmentIndex = 1
-            self.segmentChanged(self.segmentedControl)
-        }
+        // Removed automatic history tab switching - keep calendar as default
     }
     
     override func viewWillAppear(_ animated: Bool) {
