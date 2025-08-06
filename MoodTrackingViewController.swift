@@ -7,6 +7,13 @@ class MoodTrackingViewController: UIViewController {
     private var selectedMoodIndex: Int?
     private var selectedTags: Set<String> = []
     
+    // Original state for change detection
+    private var originalMoodIndex: Int?
+    private var originalJournalText: String = ""
+    private var originalTags: Set<String> = []
+    private var originalVoiceRecordingPath: String?
+    private var hasChanges = false
+    
     // UI Components
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -69,7 +76,6 @@ class MoodTrackingViewController: UIViewController {
     private let reRecordButton = UIButton()
     private let collapseHandle = UIImageView()
     
-    // Enhanced Voice Journal State
     private var isVoiceJournalExpanded = false
     private var voiceJournalHeightConstraint: NSLayoutConstraint!
     private var isRecording = false
@@ -79,6 +85,10 @@ class MoodTrackingViewController: UIViewController {
     private var playbackTimer: Timer?
     private var recordingSeconds = 0
     private var totalRecordingSeconds = 0
+    private var currentVoiceRecordingPath: String?
+    
+    // Voice recording manager
+    private let voiceManager = VoiceRecordingManager.shared
     
     // Weekly Insights
     private let insightsCard = UIView()
@@ -89,7 +99,6 @@ class MoodTrackingViewController: UIViewController {
     private let saveButton = UIButton()
     private let viewCalendarButton = UIButton()
     
-    // Data
     private let moods = [
         ("😊", "Joyful"),
         ("😌", "Peaceful"),
@@ -101,30 +110,216 @@ class MoodTrackingViewController: UIViewController {
         ("😵", "Overwhelm")
     ]
     
-    private let weekData = [
-        ("Mon", "😌"),
-        ("Tue", "🤔"),
-        ("Wed", "😊"),
-        ("Thu", "🧘"),
-        ("Fri", "🤩"),
-        ("Sat", "😌"),
-        ("Sun", "")
-    ]
-    
+    private var weekData: [(String, String)] = []
     private let tags = ["Work", "Sleep", "Family", "Social", "Self-care", "Exercise", "Creativity", "Stress"]
+    private var insights: [(String, String)] = []
     
-    private let insights = [
-        ("💙", "You've felt peaceful 3 times this week - great balance!"),
-        ("✨", "You tend to feel most excited on Fridays"),
-        ("🧘‍♀️", "\"Self-care\" appears often when you feel calm")
-    ]
+    // Data manager
+    private let dataManager = MoodDataManager.shared
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
+        loadRealData()
         updateSaveButtonState()
+        setupVoiceRecording()
+    }
+    
+    // MARK: - Real Data Loading
+    private func loadRealData() {
+        // Load current streak
+        let currentStreak = dataManager.getCurrentStreak()
+        streakLabel.text = currentStreak > 0 ? "🎖 \(currentStreak) days logged in a row! 🌟" : "🌟 Start your mood tracking streak today!"
+        
+        // Load past week data
+        weekData = dataManager.getPastWeekMoods()
+        updateWeekView()
+        
+        // Load insights
+        insights = dataManager.generateInsights()
+        updateInsightsView()
+        
+        // Update mood trend chart with real data
+        DispatchQueue.main.async {
+            self.drawRealMoodChart()
+        }
+        
+        // Load existing mood entry for today if it exists
+        loadTodaysMoodEntry()
+        
+        // Update UI to reflect completion status
+        updateCompletionStatus()
+    }
+    
+    private func updateWeekView() {
+        // Clear existing day views
+        weekStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // Add new day views with real data
+        for (day, emoji) in weekData {
+            let dayView = createDayView(day: day, emoji: emoji)
+            weekStackView.addArrangedSubview(dayView)
+        }
+    }
+    
+    private func updateInsightsView() {
+        // Clear existing insight views
+        insightsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // Add new insight views with real data
+        for (emoji, text) in insights {
+            let insightView = createInsightView(emoji: emoji, text: text)
+            insightsStackView.addArrangedSubview(insightView)
+        }
+    }
+    
+    private func drawRealMoodChart() {
+        let trendData = dataManager.getMoodTrendData()
+        
+        guard !trendData.isEmpty else {
+            // Show placeholder chart if no data
+            drawMoodChart()
+            return
+        }
+        
+        // Clear existing chart
+        chartShapeLayer.removeFromSuperlayer()
+        chartView.layer.sublayers?.forEach { layer in
+            if layer != chartShapeLayer {
+                layer.removeFromSuperlayer()
+            }
+        }
+        chartView.subviews.forEach { $0.removeFromSuperview() }
+        
+        let width = chartView.bounds.width
+        let height = chartView.bounds.height
+        
+        // Create points from real data
+        var points: [CGPoint] = []
+        for (index, value) in trendData.enumerated() {
+            let x = width * CGFloat(index) / CGFloat(max(trendData.count - 1, 1))
+            let y = height * (1.0 - (value - 1.0) / 4.0) // Scale 1-5 to height
+            points.append(CGPoint(x: x, y: y))
+        }
+        
+        // Create path
+        let path = UIBezierPath()
+        if !points.isEmpty {
+            path.move(to: points[0])
+            for i in 1..<points.count {
+                path.addLine(to: points[i])
+            }
+        }
+        
+        // Configure shape layer
+        chartShapeLayer.path = path.cgPath
+        chartShapeLayer.strokeColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 1.0).cgColor
+        chartShapeLayer.fillColor = UIColor.clear.cgColor
+        chartShapeLayer.lineWidth = 3
+        chartShapeLayer.lineCap = .round
+        chartShapeLayer.lineJoin = .round
+        
+        chartView.layer.addSublayer(chartShapeLayer)
+        
+        // Add dots
+        for point in points {
+            let dot = CAShapeLayer()
+            let dotPath = UIBezierPath(arcCenter: point, radius: 4, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            dot.path = dotPath.cgPath
+            dot.fillColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 1.0).cgColor
+            chartView.layer.addSublayer(dot)
+        }
+        
+        // Add day labels for past week
+        let dayLabels = weekData.map { $0.0 }
+        for (index, day) in dayLabels.enumerated() {
+            let label = UILabel()
+            label.text = day
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            chartView.addSubview(label)
+            
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: chartView.leadingAnchor, constant: width * CGFloat(index) / CGFloat(max(dayLabels.count - 1, 1))),
+                label.bottomAnchor.constraint(equalTo: chartView.bottomAnchor)
+            ])
+        }
+    }
+    
+    private func loadTodaysMoodEntry() {
+        let today = Calendar.current.startOfDay(for: Date())
+        if let todayEntry = dataManager.getMoodEntry(for: today) {
+            // Pre-select today's mood if already entered
+            if let moodIndex = moods.firstIndex(where: { $0.1 == todayEntry.moodLabel }) {
+                selectedMoodIndex = moodIndex
+                originalMoodIndex = moodIndex  // Store original
+                moodButtons[moodIndex].backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.2)
+                moodButtons[moodIndex].layer.borderColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0).cgColor
+                moodButtons[moodIndex].layer.borderWidth = 2
+            }
+            
+            // Pre-fill journal text
+            if !todayEntry.journalText.isEmpty {
+                journalTextView.text = todayEntry.journalText
+                journalTextView.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+                originalJournalText = todayEntry.journalText  // Store original
+            }
+            
+            // Pre-select tags
+            selectedTags = Set(todayEntry.tags)
+            originalTags = Set(todayEntry.tags)  // Store original
+            for (index, tag) in tags.enumerated() {
+                if selectedTags.contains(tag) {
+                    tagButtons[index].backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+                    tagButtons[index].setTitleColor(UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0), for: .normal)
+                }
+            }
+            
+            // Load existing voice recording if any
+            if let voicePath = dataManager.getVoiceRecordingPath(for: today) {
+                currentVoiceRecordingPath = voicePath
+                originalVoiceRecordingPath = voicePath  // Store original
+                totalRecordingSeconds = Int(dataManager.getVoiceRecordingDuration(for: today))
+                hasRecording = true
+                updateButtonStates(recording: false, playing: false, hasRecording: true)
+                updateTimerDisplay(seconds: totalRecordingSeconds)
+            }
+            
+            updateSaveButtonState()
+        } else {
+            // No existing entry - clear original state
+            originalMoodIndex = nil
+            originalJournalText = ""
+            originalTags = []
+            originalVoiceRecordingPath = nil
+        }
+    }
+    
+    private func updateCompletionStatus() {
+        if dataManager.hasTodaysMoodEntry() {
+            // User already logged mood today - update save button text
+            saveButton.setTitle("Update Today's Reflection", for: .normal)
+        } else {
+            // User hasn't logged mood today - standard save button
+            saveButton.setTitle("Save Today's Reflection", for: .normal)
+        }
+        
+        // Always use standard styling - no green colors or checkmarks
+        titleLabel.text = "Today's Mood"
+        titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+        
+        // Standard streak styling
+        let currentStreak = dataManager.getCurrentStreak()
+        streakBanner.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 1.0)
+        streakLabel.textColor = UIColor(red: 0.4, green: 0.3, blue: 0.3, alpha: 1.0)
+        streakLabel.text = currentStreak > 0 ? "🎖 \(currentStreak) days logged in a row! 🌟" : "🌟 Start your mood tracking streak today!"
+    }
+    
+    private func setupVoiceRecording() {
+        voiceManager.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -136,7 +331,6 @@ class MoodTrackingViewController: UIViewController {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
-        // IMPORTANT: Clean up all timers and animations
         cleanupVoiceJournal()
     }
     
@@ -271,10 +465,16 @@ class MoodTrackingViewController: UIViewController {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         
+        // Check if this is today
+        let today = DateFormatter()
+        today.dateFormat = "E"
+        let todayString = today.string(from: Date())
+        let isToday = (day == todayString)
+        
         let dayLabel = UILabel()
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
-        dayLabel.text = day
-        dayLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        dayLabel.text = isToday ? "Today" : day
+        dayLabel.font = UIFont.systemFont(ofSize: isToday ? 12 : 14, weight: isToday ? .bold : .medium)
         dayLabel.textColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
         dayLabel.textAlignment = .center
         container.addSubview(dayLabel)
@@ -319,14 +519,12 @@ class MoodTrackingViewController: UIViewController {
         chartView.backgroundColor = .clear
         moodTrendCard.addSubview(chartView)
         
-        // This will be drawn after layout
         DispatchQueue.main.async {
             self.drawMoodChart()
         }
     }
     
     private func drawMoodChart() {
-        // Sample data points
         let width = chartView.bounds.width
         let height = chartView.bounds.height
         let points = [
@@ -574,7 +772,7 @@ class MoodTrackingViewController: UIViewController {
         setupVoiceJournalCard()
     }
     
-    // MARK: - Fixed Voice Journal Setup
+    // MARK: - Voice Journal Setup
     private func setupVoiceJournalCard() {
         // Voice Journal Card
         voiceJournalCard.translatesAutoresizingMaskIntoConstraints = false
@@ -655,7 +853,6 @@ class MoodTrackingViewController: UIViewController {
         controlsStackView.alignment = .center
         voiceJournalContentView.addSubview(controlsStackView)
         
-        // FIXED BUTTON SETUP - Remove all debug code and backup gestures
         setupVoiceJournalButtons()
         
         // Collapse Handle
@@ -671,9 +868,8 @@ class MoodTrackingViewController: UIViewController {
         collapseHandle.isUserInteractionEnabled = true
     }
     
-    // MARK: - Fixed Button Setup
+    // MARK: - Button Setup
     private func setupVoiceJournalButtons() {
-        // Record Button - CLEAN SETUP
         recordButton.translatesAutoresizingMaskIntoConstraints = false
         recordButton.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 1.0)
         recordButton.layer.cornerRadius = 22
@@ -1008,6 +1204,32 @@ class MoodTrackingViewController: UIViewController {
         voiceJournalHeightConstraint.isActive = true
     }
     
+    // MARK: - Change Detection
+    private func detectChanges() -> Bool {
+        // Check if mood selection changed
+        if selectedMoodIndex != originalMoodIndex {
+            return true
+        }
+        
+        // Check if journal text changed
+        let currentJournalText = journalTextView.textColor == UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) ? "" : (journalTextView.text ?? "")
+        if currentJournalText != originalJournalText {
+            return true
+        }
+        
+        // Check if tags changed
+        if selectedTags != originalTags {
+            return true
+        }
+        
+        // Check if voice recording changed
+        if currentVoiceRecordingPath != originalVoiceRecordingPath {
+            return true
+        }
+        
+        return false
+    }
+
     // MARK: - Actions
     @objc private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
@@ -1041,18 +1263,48 @@ class MoodTrackingViewController: UIViewController {
             sender.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
             sender.setTitleColor(UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0), for: .normal)
         }
+        
+        updateSaveButtonState()
     }
     
     @objc private func saveButtonTapped() {
-        // Show success animation or navigate back
-        let alert = UIAlertController(title: "Reflection Saved!", message: "Your mood and thoughts have been recorded.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-            self.navigationController?.popViewController(animated: true)
-        })
-        present(alert, animated: true)
+        guard let selectedIndex = selectedMoodIndex else {
+            print("❌ No mood selected")
+            return
+        }
+        
+        let selectedMood = moods[selectedIndex]
+        let journalText = journalTextView.textColor == UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) ? "" : journalTextView.text
+        
+        // Save to data manager
+        let success = dataManager.saveMoodEntry(
+            emoji: selectedMood.0,
+            moodLabel: selectedMood.1,
+            journalText: journalText ?? "",
+            tags: Array(selectedTags),
+            voiceRecordingPath: currentVoiceRecordingPath,
+            voiceRecordingDuration: Double(totalRecordingSeconds)
+        )
+        
+        if success {
+            // Update completion status immediately
+            updateCompletionStatus()
+            
+            // Show success animation or navigate back
+            let alert = UIAlertController(title: "Reflection Saved!", message: "Your mood and thoughts have been recorded.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                self.navigationController?.popViewController(animated: true)
+            })
+            present(alert, animated: true)
+        } else {
+            // Show error alert
+            let alert = UIAlertController(title: "Save Failed", message: "Could not save your mood entry. Please try again.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        }
     }
     
-    // MARK: - Fixed Voice Journal Actions
+    // MARK: - Voice Journal Actions
     @objc private func voiceJournalHeaderTapped() {
         print("🎙️ Voice Journal Header Tapped!")
         
@@ -1069,7 +1321,6 @@ class MoodTrackingViewController: UIViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
         
-        // Temporarily disable user interaction during animation
         voiceJournalHeader.isUserInteractionEnabled = false
         
         // Animate with proper completion handling
@@ -1121,7 +1372,7 @@ class MoodTrackingViewController: UIViewController {
         }
     }
     
-    // MARK: - Fixed Recording Actions
+    // MARK: - Recording Actions
     @objc private func recordButtonTapped() {
         print("🎙️ Record Button Tapped!")
         
@@ -1134,13 +1385,12 @@ class MoodTrackingViewController: UIViewController {
             stopPlayback()
         }
         
-        isRecording.toggle()
-        print("📱 Recording state: \(isRecording)")
-        
         if isRecording {
-            startRecording()
+            // Stop recording
+            voiceManager.stopRecording()
         } else {
-            stopRecording()
+            // Start recording
+            voiceManager.startRecording()
         }
     }
     
@@ -1152,7 +1402,6 @@ class MoodTrackingViewController: UIViewController {
         recordButton.backgroundColor = UIColor(red: 0.8, green: 0.4, blue: 0.5, alpha: 0.3)
         recordButton.tintColor = UIColor(red: 0.8, green: 0.4, blue: 0.5, alpha: 1.0)
         
-        // Disable other buttons during recording
         updateButtonStates(recording: true, playing: false, hasRecording: hasRecording)
         
         // Reset and start timer
@@ -1219,7 +1468,7 @@ class MoodTrackingViewController: UIViewController {
     
     @objc private func playButtonTapped() {
         print("▶️ Play Button Tapped!")
-        guard hasRecording else {
+        guard hasRecording, let voicePath = currentVoiceRecordingPath else {
             print("❌ No recording to play")
             return
         }
@@ -1227,12 +1476,10 @@ class MoodTrackingViewController: UIViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
         
-        isPlaying.toggle()
-        
         if isPlaying {
-            startPlayback()
+            voiceManager.stopPlayback()
         } else {
-            stopPlayback()
+            voiceManager.playRecording(filePath: voicePath)
         }
     }
     
@@ -1351,6 +1598,9 @@ class MoodTrackingViewController: UIViewController {
         // Reset title
         voiceJournalTitleLabel.text = "Voice Journal"
         voiceJournalTitleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+        
+        // Update save button state since recording was cleared
+        updateSaveButtonState()
     }
     
     // MARK: - Helper Methods
@@ -1396,11 +1646,21 @@ class MoodTrackingViewController: UIViewController {
     }
     
     private func updateSaveButtonState() {
-        let isValid = selectedMoodIndex != nil
-        saveButton.isEnabled = isValid
-        saveButton.backgroundColor = isValid ?
-            UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0) :
-            UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+        // For existing entries, enable only if there are changes
+        if dataManager.hasTodaysMoodEntry() {
+            let hasChanges = detectChanges()
+            saveButton.isEnabled = hasChanges
+            saveButton.backgroundColor = hasChanges ?
+                UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0) :
+                UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+        } else {
+            // For new entries, just check if mood is selected
+            let isValid = selectedMoodIndex != nil
+            saveButton.isEnabled = isValid
+            saveButton.backgroundColor = isValid ?
+                UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0) :
+                UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+        }
     }
 }
 
@@ -1418,10 +1678,15 @@ extension MoodTrackingViewController: UITextViewDelegate {
             textView.text = "Today I feel... because..."
             textView.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
         }
+        updateSaveButtonState()
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        updateSaveButtonState()
     }
 }
 
-// MARK: - Enhanced WaveformView
+// MARK: - WaveformView
 class WaveformView: UIView {
     
     private var displayLink: CADisplayLink?
@@ -1447,7 +1712,6 @@ class WaveformView: UIView {
         let path = UIBezierPath()
         let midY = bounds.height / 2
         let baseAmplitude: CGFloat = isAnimating ? (isRecordingMode ? 12 : 8) : 0
-        let frequency: CGFloat = isRecordingMode ? 0.03 : 0.025
         let phaseShift = phase
         
         // Draw waveform or straight line
@@ -1516,5 +1780,64 @@ class WaveformView: UIView {
     
     deinit {
         displayLink?.invalidate()
+    }
+}
+
+// MARK: - VoiceRecordingManagerDelegate
+extension MoodTrackingViewController: VoiceRecordingManagerDelegate {
+    func recordingDidStart() {
+        DispatchQueue.main.async {
+            self.isRecording = true
+            self.startRecording()
+        }
+    }
+    
+    func recordingDidStop(success: Bool, filePath: String?, duration: TimeInterval) {
+        DispatchQueue.main.async {
+            self.isRecording = false
+            
+            if success, let path = filePath {
+                self.currentVoiceRecordingPath = path
+                self.totalRecordingSeconds = Int(duration)
+                self.hasRecording = true
+            } else {
+                self.currentVoiceRecordingPath = nil
+                self.hasRecording = false
+            }
+            
+            self.stopRecording()
+            self.updateSaveButtonState()
+        }
+    }
+    
+    func playbackDidStart() {
+        DispatchQueue.main.async {
+            self.isPlaying = true
+            self.startPlayback()
+        }
+    }
+    
+    func playbackDidStop() {
+        DispatchQueue.main.async {
+            self.isPlaying = false
+            self.stopPlayback()
+        }
+    }
+    
+    func recordingPermissionDenied() {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: "Microphone Permission Required",
+                message: "Please allow microphone access in Settings to record voice journals.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsUrl)
+                }
+            })
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self.present(alert, animated: true)
+        }
     }
 }

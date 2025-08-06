@@ -21,5 +21,7 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access to record voice journals for your mood tracking.</string>
 </dict>
 </plist>
