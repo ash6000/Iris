@@ -2,22 +2,6 @@
 import UIKit
 
 // MARK: - Data Models
-struct MoodEntry {
-    let id: String
-    let date: Date
-    let emoji: String
-    let moodLabel: String
-    let journalText: String
-    let tags: [String]
-    
-    var dateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "E, MMM d"
-        return formatter.string(from: date)
-    }
-    
-
-}
 
 struct CalendarDay {
     let date: Date
@@ -81,6 +65,7 @@ class MoodOverviewViewController: UIViewController {
     
     // Data
     private var moodEntries: [MoodEntry] = []
+    private let moodDataManager = MoodDataManager.shared
     private var calendarDays: [CalendarDay] = []
     private var groupedEntries: [String: [MoodEntry]] = [:]
     
@@ -124,7 +109,7 @@ class MoodOverviewViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupMockData()
+        loadRealData()
         debugData()
         setupUI()
         setupConstraints()
@@ -137,13 +122,24 @@ class MoodOverviewViewController: UIViewController {
         
         // Force layout update to ensure proper sizing
         forceLayoutUpdate()
-        
-        // Removed automatic history tab switching - keep calendar as default
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        refreshData()
+    }
+    
+    private func refreshData() {
+        loadRealData()
+        generateCalendarDays()
+        updateHistoryData()
+        
+        // Update both views
+        DispatchQueue.main.async {
+            self.calendarCollectionView.reloadData()
+            self.historyTableView.reloadData()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -153,165 +149,17 @@ class MoodOverviewViewController: UIViewController {
     
 
     
-    private func setupMockData() {
-        let calendar = Calendar.current
-        let today = Date()
+    private func loadRealData() {
+        moodEntries = moodDataManager.getAllMoodEntries()
+        print("📊 Loaded \(moodEntries.count) real mood entries from MoodDataManager")
         
-        print("🔧 Setting up mock data...")
-        print("🔧 Today is: \(today)")
-        
-        moodEntries = [
-            // TODAY - to ensure This Week has data
-            MoodEntry(
-                id: "today",
-                date: today,
-                emoji: "🌟",
-                moodLabel: "Energized",
-                journalText: "What an amazing day! Feeling on top of the world today. Everything seems to be going perfectly.",
-                tags: ["Energy", "Productivity", "Happiness"]
-            ),
-            
-            // YESTERDAY
-            MoodEntry(
-                id: "yesterday",
-                date: calendar.date(byAdding: .day, value: -1, to: today)!,
-                emoji: "🧘",
-                moodLabel: "Calm",
-                journalText: "Morning meditation really helped center me. Feeling peaceful and ready for whatever comes my way.",
-                tags: ["Self-care", "Meditation", "Peace"]
-            ),
-            
-            // 2 DAYS AGO
-            MoodEntry(
-                id: "2days",
-                date: calendar.date(byAdding: .day, value: -2, to: today)!,
-                emoji: "🤩",
-                moodLabel: "Excited",
-                journalText: "Got amazing news about my project! The client loved our proposal and we're moving forward.",
-                tags: ["Work", "Achievement", "Success"]
-            ),
-            
-            // 3 DAYS AGO
-            MoodEntry(
-                id: "3days",
-                date: calendar.date(byAdding: .day, value: -3, to: today)!,
-                emoji: "😌",
-                moodLabel: "Peaceful",
-                journalText: "Spent time in nature today at the local park. The fresh air really restored my energy.",
-                tags: ["Nature", "Self-care", "Relaxation"]
-            ),
-            
-            // 4 DAYS AGO
-            MoodEntry(
-                id: "4days",
-                date: calendar.date(byAdding: .day, value: -4, to: today)!,
-                emoji: "💪",
-                moodLabel: "Motivated",
-                journalText: "Great workout session this morning! Hit a new personal record. Feeling strong and accomplished.",
-                tags: ["Exercise", "Health", "Achievement"]
-            ),
-            
-            // 5 DAYS AGO
-            MoodEntry(
-                id: "5days",
-                date: calendar.date(byAdding: .day, value: -5, to: today)!,
-                emoji: "😊",
-                moodLabel: "Joyful",
-                journalText: "Had lunch with my best friend today. We laughed so much! Grateful for wonderful friendships.",
-                tags: ["Social", "Friendship", "Gratitude"]
-            ),
-            
-            // 6 DAYS AGO
-            MoodEntry(
-                id: "6days",
-                date: calendar.date(byAdding: .day, value: -6, to: today)!,
-                emoji: "🤔",
-                moodLabel: "Thoughtful",
-                journalText: "Started reading a fascinating book about psychology. My mind is buzzing with new ideas.",
-                tags: ["Learning", "Books", "Growth"]
-            ),
-            
-            // LAST WEEK ENTRIES
-            MoodEntry(
-                id: "lastweek1",
-                date: calendar.date(byAdding: .day, value: -8, to: today)!,
-                emoji: "🎉",
-                moodLabel: "Celebratory",
-                journalText: "My sister got engaged! So happy for her and excited about the upcoming wedding planning.",
-                tags: ["Family", "Celebration", "Love"]
-            ),
-            
-            MoodEntry(
-                id: "lastweek2",
-                date: calendar.date(byAdding: .day, value: -10, to: today)!,
-                emoji: "🌈",
-                moodLabel: "Hopeful",
-                journalText: "Saw the most beautiful rainbow today. It felt like a sign that good things are coming.",
-                tags: ["Hope", "Nature", "Optimism"]
-            ),
-            
-            MoodEntry(
-                id: "lastweek3",
-                date: calendar.date(byAdding: .day, value: -12, to: today)!,
-                emoji: "🎨",
-                moodLabel: "Creative",
-                journalText: "Spent the afternoon painting. Lost track of time completely - that flow state is magical.",
-                tags: ["Art", "Creativity", "Flow"]
-            ),
-            
-            // EARLIER THIS MONTH
-            MoodEntry(
-                id: "earlier1",
-                date: calendar.date(byAdding: .day, value: -18, to: today)!,
-                emoji: "🧘‍♀️",
-                moodLabel: "Centered",
-                journalText: "Yoga class was exactly what I needed. Feeling centered and grateful for this practice.",
-                tags: ["Exercise", "Self-care", "Balance"]
-            ),
-            
-            MoodEntry(
-                id: "earlier2",
-                date: calendar.date(byAdding: .day, value: -22, to: today)!,
-                emoji: "💡",
-                moodLabel: "Inspired",
-                journalText: "Had a breakthrough moment during my morning walk. Sometimes the best ideas come when you're not trying.",
-                tags: ["Ideas", "Walking", "Innovation"]
-            ),
-            
-            MoodEntry(
-                id: "earlier3",
-                date: calendar.date(byAdding: .day, value: -25, to: today)!,
-                emoji: "🍕",
-                moodLabel: "Satisfied",
-                journalText: "Perfect lazy Sunday with pizza, movies, and no agenda. Sometimes the best self-care is being unproductive.",
-                tags: ["Rest", "Self-care", "Movies"]
-            ),
-            
-            // OLDER ENTRIES (for All Time filter)
-            MoodEntry(
-                id: "older1",
-                date: calendar.date(byAdding: .day, value: -35, to: today)!,
-                emoji: "🏆",
-                moodLabel: "Accomplished",
-                journalText: "Finished my first 10K run! Six months of training paid off. Proud of my dedication.",
-                tags: ["Exercise", "Achievement", "Goals"]
-            ),
-            
-            MoodEntry(
-                id: "older2",
-                date: calendar.date(byAdding: .day, value: -45, to: today)!,
-                emoji: "📚",
-                moodLabel: "Studious",
-                journalText: "Completed an online course on digital marketing. Learning new skills always feels rewarding.",
-                tags: ["Learning", "Skills", "Career"]
-            )
-        ]
-        
-        // Sort entries by date (newest first)
-        moodEntries = moodEntries.sorted { $0.date > $1.date }
-        
-        print("🔧 Created \(moodEntries.count) mock entries")
-        print("🔧 Date range: \(moodEntries.last?.date ?? Date()) to \(moodEntries.first?.date ?? Date())")
+        if !moodEntries.isEmpty {
+            let oldest = moodEntries.last?.date ?? Date()
+            let newest = moodEntries.first?.date ?? Date()
+            print("📊 Date range: \(oldest) to \(newest)")
+        } else {
+            print("📊 No mood entries found")
+        }
     }
     
     // MARK: - UI Setup

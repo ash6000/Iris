@@ -1,7 +1,17 @@
 import Foundation
 import UIKit
 
-// MARK: - Extended MoodEntry for persistence (using existing struct)
+// MARK: - MoodEntry Data Model
+struct MoodEntry {
+    let id: String
+    let date: Date
+    let emoji: String
+    let moodLabel: String
+    let journalText: String
+    let tags: [String]
+}
+
+// MARK: - Extended MoodEntry for persistence
 extension MoodEntry {
     var hasVoiceRecording: Bool {
         return voiceRecordingPath != nil && !voiceRecordingPath!.isEmpty
@@ -16,6 +26,12 @@ extension MoodEntry {
     var voiceRecordingDuration: Double {
         // This will be handled by the data manager
         return 0
+    }
+    
+    var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, MMM d"
+        return formatter.string(from: date)
     }
 }
 
