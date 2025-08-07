@@ -8,12 +8,22 @@
 import Foundation
 import UIKit
 
+// MARK: - Delegate Protocol
+protocol MoodEntryDetailDelegate: AnyObject {
+    func moodEntryDidUpdate(_ moodEntry: MoodEntry)
+    func moodEntryDidDelete(_ moodEntry: MoodEntry)
+}
+
 class MoodEntryDetailViewController: UIViewController {
     
     // MARK: - Properties
     private var moodEntry: MoodEntry
     private var isEditingJournal = false
     private var originalJournalText = ""
+    
+    // Data management
+    private let dataManager = MoodDataManager.shared
+    weak var delegate: MoodEntryDetailDelegate?
     
     // UI Components
     private let scrollView = UIScrollView()
@@ -81,6 +91,9 @@ class MoodEntryDetailViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        // Refresh mood entry data in case it was updated elsewhere
+        refreshMoodEntryData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -575,6 +588,18 @@ class MoodEntryDetailViewController: UIViewController {
         ])
     }
     
+    // MARK: - Data Refresh
+    private func refreshMoodEntryData() {
+        // Get the latest version of this mood entry from persistence
+        if let updatedEntry = dataManager.getMoodEntry(for: moodEntry.date) {
+            print("🔄 Refreshing mood entry data: '\(updatedEntry.journalText)'")
+            moodEntry = updatedEntry
+            configureContent()
+        } else {
+            print("⚠️ Could not find mood entry for date: \(moodEntry.date)")
+        }
+    }
+    
     // MARK: - Configuration
     private func configureContent() {
         // Configure date
@@ -592,12 +617,46 @@ class MoodEntryDetailViewController: UIViewController {
         loggedTimeLabel.text = "Logged at \(timeFormatter.string(from: moodEntry.date))"
         
         // Configure journal text
-        journalDisplayLabel.text = moodEntry.journalText
+        print("📝 Configuring journal text: '\(moodEntry.journalText)' (isEmpty: \(moodEntry.journalText.isEmpty))")
+        let displayText = moodEntry.journalText.isEmpty ? "No journal entry" : moodEntry.journalText
+        journalDisplayLabel.text = displayText
+        print("📝 Display text set to: '\(displayText)'")
+        journalDisplayLabel.textColor = moodEntry.journalText.isEmpty ? 
+            UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) : 
+            UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ?
+                    UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
+                    UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+            }
+        
         journalTextView.text = moodEntry.journalText
         originalJournalText = moodEntry.journalText
         
         // Configure tags
         setupTags()
+        
+        // Configure voice journal
+        configureVoiceJournal()
+    }
+    
+    private func configureVoiceJournal() {
+        let voicePath = dataManager.getVoiceRecordingPath(for: moodEntry.date)
+        let voiceDuration = dataManager.getVoiceRecordingDuration(for: moodEntry.date)
+        
+        if let _ = voicePath, voiceDuration > 0 {
+            // Has voice recording
+            durationLabel.text = formatDuration(voiceDuration)
+            voiceJournalCardView.isHidden = false
+        } else {
+            // No voice recording
+            voiceJournalCardView.isHidden = true
+        }
+    }
+    
+    private func formatDuration(_ duration: Double) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
     
     private func setupTags() {
@@ -686,11 +745,37 @@ class MoodEntryDetailViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-            // Handle deletion logic here
-            self.navigationController?.popViewController(animated: true)
+            self.deleteMoodEntry()
         })
         
         present(alert, animated: true)
+    }
+    
+    private func deleteMoodEntry() {
+        let success = dataManager.deleteMoodEntry(for: moodEntry.date)
+        
+        if success {
+            // Notify delegate about the deletion
+            delegate?.moodEntryDidDelete(moodEntry)
+            
+            // Animate deletion feedback
+            UIView.animate(withDuration: 0.3, animations: {
+                self.view.alpha = 0.5
+                self.view.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+            }) { _ in
+                // Navigate back
+                self.navigationController?.popViewController(animated: true)
+            }
+        } else {
+            // Show error alert
+            let errorAlert = UIAlertController(
+                title: "Delete Failed", 
+                message: "Could not delete the mood entry. Please try again.", 
+                preferredStyle: .alert
+            )
+            errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(errorAlert, animated: true)
+        }
     }
     
     @objc private func dismissKeyboard() {
@@ -709,7 +794,8 @@ class MoodEntryDetailViewController: UIViewController {
     }
     
     private func startEditing() {
-        journalTextView.text = journalDisplayLabel.text
+        // Use the actual journal text, not the display text which might be "No journal entry"
+        journalTextView.text = moodEntry.journalText
         
         UIView.animate(withDuration: 0.3, animations: {
             self.journalDisplayLabel.alpha = 0
@@ -737,6 +823,17 @@ class MoodEntryDetailViewController: UIViewController {
     private func cancelEditing() {
         journalTextView.text = originalJournalText
         
+        // Update display label to show current journal text
+        let displayText = originalJournalText.isEmpty ? "No journal entry" : originalJournalText
+        journalDisplayLabel.text = displayText
+        journalDisplayLabel.textColor = originalJournalText.isEmpty ? 
+            UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) : 
+            UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ?
+                    UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
+                    UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+            }
+        
         UIView.animate(withDuration: 0.3, animations: {
             self.journalTextView.alpha = 0
             self.editButtonsStackView.alpha = 0
@@ -763,36 +860,112 @@ class MoodEntryDetailViewController: UIViewController {
     }
     
     private func saveJournalChanges() {
-        guard let newText = journalTextView.text, !newText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            // Show error alert for empty text
-            let alert = UIAlertController(title: "Empty Entry", message: "Journal entry cannot be empty.", preferredStyle: .alert)
+        guard let newText = journalTextView.text else { return }
+        
+        // Allow empty text (user can clear journal entry)
+        let trimmedText = newText.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("💾 Saving journal text: '\(trimmedText)' (original: '\(originalJournalText)')")
+        
+        // Update the mood entry with new journal text
+        let success = dataManager.saveMoodEntry(
+            emoji: moodEntry.emoji,
+            moodLabel: moodEntry.moodLabel,
+            journalText: trimmedText,
+            tags: moodEntry.tags,
+            voiceRecordingPath: dataManager.getVoiceRecordingPath(for: moodEntry.date),
+            voiceRecordingDuration: dataManager.getVoiceRecordingDuration(for: moodEntry.date)
+        )
+        
+        print("💾 Save result: \(success)")
+        
+        if success {
+            // Update local mood entry object
+            let updatedEntry = MoodEntry(
+                id: moodEntry.id,
+                date: moodEntry.date,
+                emoji: moodEntry.emoji,
+                moodLabel: moodEntry.moodLabel,
+                journalText: trimmedText,
+                tags: moodEntry.tags
+            )
+            self.moodEntry = updatedEntry
+            
+            // Update UI
+            let displayText = trimmedText.isEmpty ? "No journal entry" : trimmedText
+            print("💾 Updating display text to: '\(displayText)'")
+            journalDisplayLabel.text = displayText
+            journalDisplayLabel.textColor = trimmedText.isEmpty ? 
+                UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) : 
+                UIColor { traitCollection in
+                    return traitCollection.userInterfaceStyle == .dark ?
+                        UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
+                        UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+                }
+            
+            originalJournalText = trimmedText
+            
+            // Notify delegate about the update
+            delegate?.moodEntryDidUpdate(updatedEntry)
+            
+            // Animate save feedback
+            UIView.animate(withDuration: 0.2, animations: {
+                self.saveButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                self.saveButton.alpha = 0.8
+            }) { _ in
+                UIView.animate(withDuration: 0.2) {
+                    self.saveButton.transform = .identity
+                    self.saveButton.alpha = 1.0
+                }
+            }
+            
+            // Show success feedback
+            showSaveSuccess()
+            
+        } else {
+            // Show error alert
+            let alert = UIAlertController(title: "Save Failed", message: "Could not save journal entry. Please try again.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
-            return
-        }
-        
-        // Update the mood entry
-        journalDisplayLabel.text = newText
-        originalJournalText = newText
-        
-        // Animate save feedback
-        UIView.animate(withDuration: 0.2, animations: {
-            self.saveButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-            self.saveButton.alpha = 0.8
-        }) { _ in
-            UIView.animate(withDuration: 0.2) {
-                self.saveButton.transform = .identity
-                self.saveButton.alpha = 1.0
-            }
         }
         
         // Exit editing mode
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.cancelEditing()
         }
+    }
+    
+    private func showSaveSuccess() {
+        // Create temporary success label
+        let successLabel = UILabel()
+        successLabel.text = "✅ Saved"
+        successLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        successLabel.textColor = UIColor(red: 0.2, green: 0.7, blue: 0.2, alpha: 1.0)
+        successLabel.backgroundColor = UIColor(red: 0.9, green: 0.95, blue: 0.9, alpha: 0.9)
+        successLabel.textAlignment = .center
+        successLabel.layer.cornerRadius = 12
+        successLabel.clipsToBounds = true
+        successLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Here you would typically save to your data source
-        // For example: MoodDataManager.shared.updateMoodEntry(moodEntry)
+        view.addSubview(successLabel)
+        
+        NSLayoutConstraint.activate([
+            successLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            successLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            successLabel.widthAnchor.constraint(equalToConstant: 100),
+            successLabel.heightAnchor.constraint(equalToConstant: 32)
+        ])
+        
+        // Animate in and out
+        successLabel.alpha = 0
+        UIView.animate(withDuration: 0.3, animations: {
+            successLabel.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 1.5, animations: {
+                successLabel.alpha = 0
+            }) { _ in
+                successLabel.removeFromSuperview()
+            }
+        }
     }
     
     // MARK: - Animations

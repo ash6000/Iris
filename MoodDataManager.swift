@@ -179,6 +179,36 @@ class MoodDataManager {
             .map { $0.toMoodEntry() }
     }
     
+    func deleteMoodEntry(for date: Date) -> Bool {
+        var entries = loadMoodEntries()
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        
+        // Find and remove the entry for this date
+        if let index = entries.firstIndex(where: { Calendar.current.isDate($0.date, inSameDayAs: startOfDay) }) {
+            let entryToDelete = entries[index]
+            entries.remove(at: index)
+            
+            // Clean up voice recording file if it exists
+            if let voicePath = entryToDelete.voiceRecordingPath, !voicePath.isEmpty {
+                do {
+                    if FileManager.default.fileExists(atPath: voicePath) {
+                        try FileManager.default.removeItem(atPath: voicePath)
+                        print("✅ Deleted voice recording: \(voicePath)")
+                    }
+                } catch {
+                    print("⚠️ Failed to delete voice recording: \(error)")
+                }
+            }
+            
+            saveMoodEntries(entries)
+            print("✅ Deleted mood entry for \(startOfDay)")
+            return true
+        }
+        
+        print("❌ No mood entry found for \(startOfDay)")
+        return false
+    }
+    
     // Helper method to get persistent entry (for voice recordings)
     private func getPersistentMoodEntry(for date: Date) -> PersistentMoodEntry? {
         let entries = loadMoodEntries()

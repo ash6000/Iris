@@ -25,7 +25,7 @@ enum HistoryFilterPeriod: CaseIterable {
 }
 
 // MARK: - MoodOverviewViewController
-class MoodOverviewViewController: UIViewController {
+class MoodOverviewViewController: UIViewController, MoodEntryDetailDelegate {
     
     // MARK: - Properties
     private var selectedSegmentIndex = 0
@@ -969,17 +969,9 @@ extension MoodOverviewViewController: UICollectionViewDelegateFlowLayout {
             // Navigate to MoodDetailViewController (simulate for now)
             print("Navigate to mood detail for: \(moodEntry.moodLabel) on \(moodEntry.dateString)")
             
-            // TODO: Push to MoodDetailViewController
-//            let alert = UIAlertController(
-//                title: "\(moodEntry.emoji) \(moodEntry.moodLabel)",
-//                message: "\(moodEntry.dateString)\n\n\(moodEntry.journalText)\n\nTags: \(moodEntry.tags.joined(separator: ", "))",
-//                preferredStyle: .alert
-//            )
-//            alert.addAction(UIAlertAction(title: "OK", style: .default))
-//            present(alert, animated: true)
-//            
-//            let detailVC = MoodEntryDetailViewController(moodEntry: moodEntry)
-//                   navigationController?.pushViewController(detailVC, animated: true)
+            let detailVC = MoodEntryDetailViewController(moodEntry: moodEntry)
+            detailVC.delegate = self
+            navigationController?.pushViewController(detailVC, animated: true)
         }
     }
 }
@@ -1214,7 +1206,8 @@ extension MoodOverviewViewController: UITableViewDelegate {
 //        present(alert, animated: true)
         
         let detailVC = MoodEntryDetailViewController(moodEntry: moodEntry)
-               navigationController?.pushViewController(detailVC, animated: true)
+        detailVC.delegate = self
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 
@@ -2224,5 +2217,43 @@ class MoodEntryCell: UITableViewCell {
         // Force layout update
         setNeedsLayout()
         layoutIfNeeded()
+    }
+}
+
+// MARK: - MoodEntryDetailDelegate
+extension MoodOverviewViewController {
+    func moodEntryDidUpdate(_ moodEntry: MoodEntry) {
+        print("✅ Mood entry updated: \(moodEntry.moodLabel)")
+        // Refresh the data to reflect changes
+        loadData()
+        generateCalendarDays()
+        updateHistoryData()
+        
+        // Refresh the currently visible tab
+        if selectedSegmentIndex == 0 {
+            calendarCollectionView.reloadData()
+        } else {
+            historyTableView.reloadData()
+        }
+    }
+    
+    func moodEntryDidDelete(_ moodEntry: MoodEntry) {
+        print("🗑 Mood entry deleted: \(moodEntry.moodLabel)")
+        // Refresh the data to reflect deletion
+        loadData()
+        generateCalendarDays()
+        updateHistoryData()
+        
+        // Refresh the currently visible tab
+        if selectedSegmentIndex == 0 {
+            calendarCollectionView.reloadData()
+        } else {
+            historyTableView.reloadData()
+        }
+    }
+    
+    private func loadData() {
+        moodEntries = moodDataManager.getAllMoodEntries()
+        print("📊 Loaded \(moodEntries.count) mood entries")
     }
 }
