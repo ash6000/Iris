@@ -194,15 +194,21 @@ class MoodDataManager {
         var currentStreak = 0
         var checkDate = today
         
+        print("🎖 Starting streak calculation from: \(today)")
+        
         while true {
-            if getMoodEntry(for: checkDate) != nil {
+            let entry = getMoodEntry(for: checkDate)
+            if entry != nil {
                 currentStreak += 1
+                print("🎖 Day \(currentStreak): \(checkDate) has entry: \(entry!.moodLabel)")
                 checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
             } else {
+                print("🎖 Day check: \(checkDate) has no entry, streak stops at \(currentStreak)")
                 break
             }
         }
         
+        print("🎖 Final streak: \(currentStreak)")
         return currentStreak
     }
     
@@ -273,10 +279,10 @@ class MoodDataManager {
         return insights.isEmpty ? [("📊", "Keep tracking to unlock personalized insights!")] : insights
     }
     
-    func getMoodTrendData() -> [CGFloat] {
+    func getMoodTrendData() -> [(Date, CGFloat, String, Bool)] {
         let calendar = Calendar.current
         let today = Date()
-        var trendData: [CGFloat] = []
+        var trendData: [(Date, CGFloat, String, Bool)] = []
         
         // Map mood labels to numerical values for trend calculation
         let moodValues: [String: CGFloat] = [
@@ -290,12 +296,51 @@ class MoodDataManager {
             "Sad": 1.0
         ]
         
-        // Get last 7 days of data
-        for i in (0...6).reversed() {
-            guard let date = calendar.date(byAdding: .day, value: -i, to: today) else { continue }
-            let entry = getMoodEntry(for: date)
-            let value = entry != nil ? (moodValues[entry!.moodLabel] ?? 3.0) : 3.0
-            trendData.append(value)
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "E" // Short day names like Sun, Mon, Tue
+        
+        // Find the most recent Sunday (start of week)
+        let todayWeekday = calendar.component(.weekday, from: today) // 1 = Sunday, 2 = Monday, etc.
+        let daysFromSunday = todayWeekday - 1 // 0 = Sunday, 1 = Monday, etc.
+        
+        // Debug date calculation for trend data
+        let todayFormatter = DateFormatter()
+        todayFormatter.dateFormat = "yyyy-MM-dd EEEE"
+        print("🗓 Trend - Today: \(todayFormatter.string(from: today)), weekday=\(todayWeekday), daysFromSunday=\(daysFromSunday)")
+        
+        guard let startOfWeek = calendar.date(byAdding: .day, value: -daysFromSunday, to: today) else {
+            return []
+        }
+        
+        print("🗓 Trend - Start of week: \(todayFormatter.string(from: startOfWeek))")
+        
+        // Get all 7 days starting from Sunday - MUST be exactly 7 days
+        for i in 0..<7 {
+            guard let date = calendar.date(byAdding: .day, value: i, to: startOfWeek) else { 
+                print("❌ ERROR: Could not calculate date for day \(i)")
+                continue 
+            }
+            let dayName = dayFormatter.string(from: date)
+            
+            // Debug: Print each day as we process it
+            let debugFormatter = DateFormatter()
+            debugFormatter.dateFormat = "yyyy-MM-dd EEEE"
+            print("🗓 Day \(i): \(debugFormatter.string(from: date)) -> '\(dayName)'")
+            
+            if let entry = getMoodEntry(for: date) {
+                let value = moodValues[entry.moodLabel] ?? 3.0
+                trendData.append((date, value, dayName, true)) // true = has actual data
+                print("   ✅ Has data: \(entry.moodLabel) = \(value)")
+            } else {
+                // Use neutral/default value for days without entries (for continuous line)
+                trendData.append((date, 3.0, dayName, false)) // false = default value
+                print("   ⭕ No data, using default: 3.0")
+            }
+        }
+        
+        print("🗓 Total trend data entries: \(trendData.count)")
+        if trendData.count != 7 {
+            print("❌ ERROR: Expected 7 days, got \(trendData.count)")
         }
         
         return trendData

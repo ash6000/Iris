@@ -13,6 +13,7 @@ class MoodTrackingViewController: UIViewController {
     private var originalTags: Set<String> = []
     private var originalVoiceRecordingPath: String?
     private var hasChanges = false
+    private var chartNeedsUpdate = false
     
     // UI Components
     private let scrollView = UIScrollView()
@@ -125,6 +126,7 @@ class MoodTrackingViewController: UIViewController {
         loadRealData()
         updateSaveButtonState()
         setupVoiceRecording()
+        setupKeyboardDismissal()
     }
     
     // MARK: - Real Data Loading
@@ -141,10 +143,8 @@ class MoodTrackingViewController: UIViewController {
         insights = dataManager.generateInsights()
         updateInsightsView()
         
-        // Update mood trend chart with real data
-        DispatchQueue.main.async {
-            self.drawRealMoodChart()
-        }
+        // Instead of updating chart, refresh the entire view safely
+        refreshViewAfterDataChange()
         
         // Load existing mood entry for today if it exists
         loadTodaysMoodEntry()
@@ -175,76 +175,291 @@ class MoodTrackingViewController: UIViewController {
         }
     }
     
-    private func drawRealMoodChart() {
+    private func refreshViewAfterDataChange() {
+        // Only refresh if view is in a safe state
+        guard isViewLoaded && !isBeingDismissed && !isMovingFromParent else { return }
+        guard view.window != nil else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Double-check safety before refreshing
+            guard !self.isBeingDismissed && !self.isMovingFromParent else { return }
+            guard self.view.window != nil else { return }
+            
+            // Recreate the chart section completely
+            self.recreateChartSection()
+            
+            // Update other dynamic content
+            self.refreshDynamicContent()
+        }
+    }
+    
+    private func recreateChartSection() {
+        // Completely clear the existing chart view
+        clearChartViewSafely()
+        
+        // Reset the chart view to clean state
+        chartView.layer.sublayers?.removeAll()
+        
+        // Reset the existing shape layer
+        chartShapeLayer.path = nil
+        chartShapeLayer.removeFromSuperlayer()
+        
+        // Draw the fresh chart on the clean view
+        drawFreshChart()
+    }
+    
+    private func clearChartViewSafely() {
+        // Remove all subviews safely
+        chartView.subviews.forEach { subview in
+            subview.removeFromSuperview()
+        }
+        
+        // Remove all sublayers safely
+        chartView.layer.sublayers?.forEach { layer in
+            layer.removeFromSuperlayer()
+        }
+        
+        // Reset any transforms or animations
+        chartView.layer.removeAllAnimations()
+        chartView.transform = .identity
+    }
+    
+    private func refreshDynamicContent() {
+        // Update insights
+        insights = dataManager.generateInsights()
+        updateInsightsView()
+        
+        // Update streak display
+        updateStreakDisplay()
+        
+        // Update past week display  
+        updatePastWeekDisplay()
+    }
+    
+    private func updateStreakDisplay() {
+        let currentStreak = dataManager.getCurrentStreak()
+        print("🎖 Current streak calculated: \(currentStreak)")
+        streakLabel.text = currentStreak > 0 ? "🎖 \(currentStreak) days logged in a row! 🌟" : "🌟 Start your mood tracking streak today!"
+    }
+    
+    private func updatePastWeekDisplay() {
+        let pastWeekData = dataManager.getPastWeekMoods()
+        
+        // Debug: Print the past week data
+        print("📅 Past week data:")
+        for (i, (day, emoji)) in pastWeekData.enumerated() {
+            print("  \(i): \(day) = '\(emoji)'")
+        }
+        
+        // Clear existing past week views to prevent duplicates
+        for subview in weekStackView.subviews {
+            subview.removeFromSuperview()
+        }
+        
+        // Rebuild past week display
+        for (day, emoji) in pastWeekData {
+            let dayView = createDayView(day: day, emoji: emoji)
+            weekStackView.addArrangedSubview(dayView)
+        }
+    }
+    
+    private func drawFreshChart() {
         let trendData = dataManager.getMoodTrendData()
         
-        guard !trendData.isEmpty else {
-            // Show placeholder chart if no data
-            drawMoodChart()
+        // Debug: Print the final trend data
+        print("📊 Final chart data (\(trendData.count) days):")
+        for (i, (date, value, dayName, hasData)) in trendData.enumerated() {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEEE"
+            print("  [\(i)] \(dayName) (\(formatter.string(from: date))): value=\(value), hasData=\(hasData)")
+        }
+        
+        drawChartContent(with: trendData)
+    }
+    
+    private func updateChartIfVisible() {
+        // Only update if chart needs updating and is visible on screen
+        guard chartNeedsUpdate else { return }
+        guard isChartVisible() else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Double-check safety before updating
+            guard !self.isBeingDismissed && !self.isMovingFromParent else { return }
+            guard self.view.window != nil else { return }
+            
+            self.drawRealMoodChart()
+            self.chartNeedsUpdate = false
+        }
+    }
+    
+    private func isChartVisible() -> Bool {
+        // Check if view is loaded and in window hierarchy
+        guard isViewLoaded && view.window != nil else { return false }
+        
+        // Check if we're not being dismissed or moved
+        guard !isBeingDismissed && !isMovingFromParent else { return false }
+        
+        // Check if chart view is in the visible area of the scroll view
+        let chartFrame = chartView.convert(chartView.bounds, to: scrollView)
+        let visibleRect = CGRect(
+            x: scrollView.contentOffset.x,
+            y: scrollView.contentOffset.y,
+            width: scrollView.bounds.width,
+            height: scrollView.bounds.height
+        )
+        
+        return chartFrame.intersects(visibleRect)
+    }
+    
+    private func drawRealMoodChart() {
+        // Safety checks to prevent crashes during deallocation
+        guard !isBeingDismissed && !isMovingFromParent else { return }
+        guard chartView != nil && chartView.superview != nil else { return }
+        guard view.window != nil else { return } // Ensure view is in window hierarchy
+        
+        // Use the safe recreation approach instead of trying to clear existing content
+        recreateChartSection()
+    }
+    
+    private func drawChartContent(with trendData: [(Date, CGFloat, String, Bool)]) {
+        // Enhanced safety checks before drawing
+        guard !isBeingDismissed && !isMovingFromParent else { return }
+        guard chartView != nil && chartView.superview != nil else { return }
+        guard view.window != nil else { return } // Ensure view is still in window hierarchy
+        
+        let width = chartView.bounds.width
+        let height = chartView.bounds.height - 20 // Add padding at bottom for labels
+        
+        print("📐 Chart bounds: width=\(width), height=\(height)")
+        
+        // Don't draw if bounds are not set yet
+        guard width > 0 && height > 0 else {
+            print("❌ Chart bounds not ready yet, skipping draw")
             return
         }
         
-        // Clear existing chart
-        chartShapeLayer.removeFromSuperlayer()
-        chartView.layer.sublayers?.forEach { layer in
-            if layer != chartShapeLayer {
-                layer.removeFromSuperlayer()
+        // Create points for all 7 days (with continuous line)
+        var allPoints: [CGPoint] = []
+        var dayLabels: [String] = []
+        var realDataPoints: [CGPoint] = []
+        var defaultDataPoints: [CGPoint] = []
+        
+        // Ensure we have exactly 7 days worth of data
+        print("📊 Processing trend data: \(trendData.count) entries")
+        
+        // Process all days (should be exactly 7)
+        for (index, (date, value, dayName, hasRealData)) in trendData.enumerated() {
+            print("📊 Processing day \(index): \(dayName), value=\(value), hasRealData=\(hasRealData)")
+            
+            let x = width * CGFloat(index) / CGFloat(max(6, 1)) // Always divide by 6 for 7 days (0-6)
+            let y = height * (1.0 - (value - 1.0) / 4.0) // Scale 1-5 to height with padding
+            let point = CGPoint(x: x, y: y)
+            
+            dayLabels.append(dayName)
+            allPoints.append(point)
+            
+            if hasRealData {
+                realDataPoints.append(point)
+            } else {
+                defaultDataPoints.append(point)
             }
         }
-        chartView.subviews.forEach { $0.removeFromSuperview() }
         
-        let width = chartView.bounds.width
-        let height = chartView.bounds.height
+        print("📊 Final arrays - dayLabels: \(dayLabels), allPoints: \(allPoints.count), realData: \(realDataPoints.count), default: \(defaultDataPoints.count)")
         
-        // Create points from real data
-        var points: [CGPoint] = []
-        for (index, value) in trendData.enumerated() {
-            let x = width * CGFloat(index) / CGFloat(max(trendData.count - 1, 1))
-            let y = height * (1.0 - (value - 1.0) / 4.0) // Scale 1-5 to height
-            points.append(CGPoint(x: x, y: y))
-        }
-        
-        // Create path
-        let path = UIBezierPath()
-        if !points.isEmpty {
-            path.move(to: points[0])
-            for i in 1..<points.count {
-                path.addLine(to: points[i])
+        // Always show the continuous line and dots, even when no real data
+        // Draw continuous line through all points (including default values)
+        if allPoints.count > 1 {
+            let linePath = UIBezierPath()
+            linePath.move(to: allPoints[0])
+            
+            for i in 1..<allPoints.count {
+                linePath.addLine(to: allPoints[i])
             }
+            
+            chartShapeLayer.path = linePath.cgPath
+            chartShapeLayer.strokeColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 0.8).cgColor
+            chartShapeLayer.fillColor = UIColor.clear.cgColor
+            chartShapeLayer.lineWidth = 2
+            chartShapeLayer.lineCap = .round
+            chartShapeLayer.lineJoin = .round
+            
+            // Safety check before adding sublayer
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
+            chartView.layer.addSublayer(chartShapeLayer)
         }
         
-        // Configure shape layer
-        chartShapeLayer.path = path.cgPath
-        chartShapeLayer.strokeColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 1.0).cgColor
-        chartShapeLayer.fillColor = UIColor.clear.cgColor
-        chartShapeLayer.lineWidth = 3
-        chartShapeLayer.lineCap = .round
-        chartShapeLayer.lineJoin = .round
-        
-        chartView.layer.addSublayer(chartShapeLayer)
-        
-        // Add dots
-        for point in points {
+        // Add dots for real data points (solid/filled)
+        for point in realDataPoints {
+            // Safety check before adding dot sublayer
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
+            
             let dot = CAShapeLayer()
             let dotPath = UIBezierPath(arcCenter: point, radius: 4, startAngle: 0, endAngle: .pi * 2, clockwise: true)
             dot.path = dotPath.cgPath
             dot.fillColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 1.0).cgColor
+            
+            // Safety check before adding dot sublayer
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
             chartView.layer.addSublayer(dot)
         }
         
-        // Add day labels for past week
-        let dayLabels = weekData.map { $0.0 }
-        for (index, day) in dayLabels.enumerated() {
+        // Add dots for default data points (hollow/outlined)
+        for point in defaultDataPoints {
+            // Safety check before adding dot sublayer
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
+            
+            let dot = CAShapeLayer()
+            let dotPath = UIBezierPath(arcCenter: point, radius: 4, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            dot.path = dotPath.cgPath
+            dot.fillColor = UIColor.clear.cgColor
+            dot.strokeColor = UIColor(red: 0.85, green: 0.4, blue: 0.6, alpha: 0.5).cgColor
+            dot.lineWidth = 1.5
+            
+            // Safety check before adding dot sublayer
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
+            chartView.layer.addSublayer(dot)
+        }
+        
+        // Add motivational message when no real data exists
+        if realDataPoints.isEmpty {
+            let emptyLabel = UILabel()
+            emptyLabel.text = "Track your mood to see trends"
+            emptyLabel.textAlignment = .center
+            emptyLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+            emptyLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 0.8)
+            emptyLabel.translatesAutoresizingMaskIntoConstraints = false
+            chartView.addSubview(emptyLabel)
+            
+            NSLayoutConstraint.activate([
+                emptyLabel.centerXAnchor.constraint(equalTo: chartView.centerXAnchor),
+                emptyLabel.topAnchor.constraint(equalTo: chartView.topAnchor, constant: 8)
+            ])
+        }
+        
+        // Add day labels at the bottom
+        for (index, dayLabel) in dayLabels.enumerated() {
+            // Safety check before adding day label
+            guard !isBeingDismissed && !isMovingFromParent && view.window != nil else { return }
+            
             let label = UILabel()
-            label.text = day
-            label.font = UIFont.systemFont(ofSize: 12)
-            label.textColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+            label.text = dayLabel
+            label.textAlignment = .center
+            label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+            label.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
             label.translatesAutoresizingMaskIntoConstraints = false
             chartView.addSubview(label)
             
+            let x = width * CGFloat(index) / CGFloat(max(dayLabels.count - 1, 1))
+            
             NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: chartView.leadingAnchor, constant: width * CGFloat(index) / CGFloat(max(dayLabels.count - 1, 1))),
-                label.bottomAnchor.constraint(equalTo: chartView.bottomAnchor)
+                label.centerXAnchor.constraint(equalTo: chartView.leadingAnchor, constant: x),
+                label.bottomAnchor.constraint(equalTo: chartView.bottomAnchor, constant: -2),
+                label.widthAnchor.constraint(equalToConstant: 30)
             ])
         }
     }
@@ -322,16 +537,88 @@ class MoodTrackingViewController: UIViewController {
         voiceManager.delegate = self
     }
     
+    private func refreshDataAfterSave() {
+        // Safety check to prevent crashes during deallocation
+        guard !isBeingDismissed && !isMovingFromParent else { return }
+        
+        // Reload data from data manager
+        loadRealData()
+        
+        // Update past week view 
+        updateWeekView()
+        
+        // Update insights
+        updateInsightsView()
+        
+        // Instead of updating chart, refresh the entire view safely
+        refreshViewAfterDataChange()
+    }
+    
+    private func setupKeyboardDismissal() {
+        // Add tap gesture to dismiss keyboard when tapping outside text view
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        // Check if chart needs updating when view appears
+        updateChartIfVisible()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Chart is definitely visible now and bounds are set, force refresh
+        print("🎯 viewDidAppear - forcing chart refresh")
+        refreshViewAfterDataChange()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
         
+        // Prevent any pending chart updates
+        chartNeedsUpdate = false
+        
+        // Clean up chart to prevent crashes during navigation
+        clearChartViewSafely()
         cleanupVoiceJournal()
+    }
+    
+    private func cleanupChart() {
+        // Safely remove all chart layers and subviews with maximum safety
+        autoreleasepool {
+            do {
+                // Safely remove shape layer
+                chartShapeLayer.removeFromSuperlayer()
+                
+                // Safely remove sublayers
+                if let sublayers = chartView.layer.sublayers {
+                    for layer in Array(sublayers) {
+                        layer.removeFromSuperlayer()
+                    }
+                }
+                
+                // Safely remove subviews
+                let subviewsToRemove = Array(chartView.subviews)
+                for subview in subviewsToRemove {
+                    if subview.superview === chartView {
+                        subview.removeFromSuperview()
+                    }
+                }
+            } catch {
+                // Silently ignore any crashes during cleanup
+                print("⚠️ Safe cleanup: ignored error during chart cleanup")
+            }
+        }
     }
     
 
@@ -344,6 +631,7 @@ class MoodTrackingViewController: UIViewController {
         // Scroll View
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.delegate = self
         view.addSubview(scrollView)
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -710,6 +998,15 @@ class MoodTrackingViewController: UIViewController {
         journalTextView.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
         journalTextView.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         journalTextView.delegate = self
+        
+        // Add keyboard toolbar with Done button
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissKeyboard))
+        toolbar.items = [flexSpace, doneButton]
+        journalTextView.inputAccessoryView = toolbar
+        
         journalCard.addSubview(journalTextView)
         
         // Add placeholder
@@ -1290,6 +1587,9 @@ class MoodTrackingViewController: UIViewController {
             // Update completion status immediately
             updateCompletionStatus()
             
+            // Refresh all data including the mood trend graph
+            refreshDataAfterSave()
+            
             // Show success animation or navigate back
             let alert = UIAlertController(title: "Reflection Saved!", message: "Your mood and thoughts have been recorded.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
@@ -1662,6 +1962,13 @@ class MoodTrackingViewController: UIViewController {
                 UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
         }
     }
+    
+    deinit {
+        // Clean up to prevent crashes during deallocation
+        chartNeedsUpdate = false
+        clearChartViewSafely()
+        print("🗑️ MoodTrackingViewController deallocated")
+    }
 }
 
 // MARK: - UITextViewDelegate
@@ -1839,5 +2146,13 @@ extension MoodTrackingViewController: VoiceRecordingManagerDelegate {
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             self.present(alert, animated: true)
         }
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+extension MoodTrackingViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Check if chart becomes visible during scrolling
+        updateChartIfVisible()
     }
 }
