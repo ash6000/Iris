@@ -44,7 +44,21 @@ class MoodEntryDetailViewController: UIViewController {
     // Tags Section
     private let tagsCardView = UIView()
     private let tagsLabel = UILabel()
+    private let tagsEditButton = UIButton()
     private let tagsStackView = UIStackView()
+    private let tagsEditContainerView = UIView()
+    private var tagEditButtons: [UIButton] = []
+    private var isEditingTags = false
+    private var originalTags: Set<String> = []
+    private var selectedTags: Set<String> = []
+    
+    // Dynamic height constraint for tags card
+    private var tagsCardHeightConstraint: NSLayoutConstraint?
+    
+    // Edit Tags Buttons
+    private let tagsEditButtonsStackView = UIStackView()
+    private let tagsSaveButton = UIButton()
+    private let tagsCancelButton = UIButton()
     
     // Journal Section
     private let journalCardView = UIView()
@@ -229,7 +243,7 @@ class MoodEntryDetailViewController: UIViewController {
         tagsCardView.layer.shadowOffset = CGSize(width: 0, height: 3)
         contentView.addSubview(tagsCardView)
         
-        // Tags Label
+        // Tags Label (header style like journal entry) - Always visible
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
         tagsLabel.text = "Tags"
         tagsLabel.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
@@ -238,15 +252,171 @@ class MoodEntryDetailViewController: UIViewController {
                 UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0) :
                 UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
         }
+        tagsLabel.backgroundColor = UIColor.clear
+        tagsLabel.alpha = 1.0
+        tagsLabel.isHidden = false
+        tagsLabel.clipsToBounds = false
+        tagsLabel.layer.zPosition = 1000 // Ensure it's on top
         tagsCardView.addSubview(tagsLabel)
+        tagsCardView.bringSubviewToFront(tagsLabel)
         
-        // Tags Stack View
+        // Tags Edit Button - Always visible
+        tagsEditButton.translatesAutoresizingMaskIntoConstraints = false
+        tagsEditButton.setImage(UIImage(systemName: "pencil"), for: .normal)
+        tagsEditButton.tintColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
+                UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        }
+        tagsEditButton.alpha = 1.0
+        tagsEditButton.isHidden = false
+        tagsEditButton.addTarget(self, action: #selector(tagsEditButtonTapped), for: .touchUpInside)
+        tagsCardView.addSubview(tagsEditButton)
+        tagsCardView.bringSubviewToFront(tagsEditButton)
+        
+        // Tags Stack View (for display)
         tagsStackView.translatesAutoresizingMaskIntoConstraints = false
         tagsStackView.axis = .horizontal
         tagsStackView.spacing = 12
         tagsStackView.alignment = .leading
         tagsStackView.distribution = .fillProportionally
         tagsCardView.addSubview(tagsStackView)
+        
+        // Tags Edit Container (for editing)
+        tagsEditContainerView.translatesAutoresizingMaskIntoConstraints = false
+        tagsEditContainerView.isHidden = true
+        tagsEditContainerView.alpha = 0
+        tagsCardView.addSubview(tagsEditContainerView)
+        
+        setupTagEditButtons()
+        
+        // Tags Edit Buttons Stack View
+        tagsEditButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
+        tagsEditButtonsStackView.axis = .horizontal
+        tagsEditButtonsStackView.spacing = 16
+        tagsEditButtonsStackView.distribution = .fill
+        tagsEditButtonsStackView.isHidden = true
+        tagsEditButtonsStackView.alpha = 0
+        tagsCardView.addSubview(tagsEditButtonsStackView)
+        
+        // Tags Save Button
+        tagsSaveButton.translatesAutoresizingMaskIntoConstraints = false
+        tagsSaveButton.setTitle("💾 Save", for: .normal)
+        tagsSaveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        tagsSaveButton.setTitleColor(.white, for: .normal)
+        tagsSaveButton.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
+        tagsSaveButton.layer.cornerRadius = 16
+        tagsSaveButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 20, bottom: 12, right: 20)
+        tagsSaveButton.addTarget(self, action: #selector(tagsSaveButtonTapped), for: .touchUpInside)
+        tagsEditButtonsStackView.addArrangedSubview(tagsSaveButton)
+        
+        // Tags Cancel Button
+        tagsCancelButton.translatesAutoresizingMaskIntoConstraints = false
+        tagsCancelButton.setTitle("✕ Cancel", for: .normal)
+        tagsCancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        tagsCancelButton.setTitleColor(UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
+                UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
+        }, for: .normal)
+        tagsCancelButton.backgroundColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0) :
+                UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 1.0)
+        }
+        tagsCancelButton.layer.cornerRadius = 16
+        tagsCancelButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 20, bottom: 12, right: 20)
+        tagsCancelButton.addTarget(self, action: #selector(tagsCancelButtonTapped), for: .touchUpInside)
+        tagsEditButtonsStackView.addArrangedSubview(tagsCancelButton)
+    }
+    
+    private func setupTagEditButtons() {
+        // Clear any existing buttons
+        tagEditButtons.forEach { $0.removeFromSuperview() }
+        tagEditButtons.removeAll()
+        
+        let availableTags = ["Work", "Sleep", "Family", "Social", "Self-care", "Exercise", "Creativity", "Stress"]
+        
+        // Create a vertical stack view to hold rows of buttons
+        let verticalStackView = UIStackView()
+        verticalStackView.axis = .vertical
+        verticalStackView.spacing = 8
+        verticalStackView.alignment = .leading
+        verticalStackView.distribution = .fill
+        verticalStackView.translatesAutoresizingMaskIntoConstraints = false
+        tagsEditContainerView.addSubview(verticalStackView)
+        
+        NSLayoutConstraint.activate([
+            verticalStackView.topAnchor.constraint(equalTo: tagsEditContainerView.topAnchor),
+            verticalStackView.leadingAnchor.constraint(equalTo: tagsEditContainerView.leadingAnchor),
+            verticalStackView.trailingAnchor.constraint(lessThanOrEqualTo: tagsEditContainerView.trailingAnchor),
+            verticalStackView.bottomAnchor.constraint(equalTo: tagsEditContainerView.bottomAnchor)
+        ])
+        
+        let containerWidth = UIScreen.main.bounds.width - 72 // Account for card margins (16*2 + 20*2)
+        let spacing: CGFloat = 8
+        var currentRowWidth: CGFloat = 0
+        var currentRowStackView = createTagEditRowStackView()
+        verticalStackView.addArrangedSubview(currentRowStackView)
+        
+        for tag in availableTags {
+            let tagButton = createTagEditButton(title: tag)
+            tagEditButtons.append(tagButton)
+            
+            // Calculate button width
+            let buttonSize = tagButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 32))
+            let buttonWidth = buttonSize.width
+            
+            // Check if button fits in current row
+            let neededWidth = currentRowWidth + (currentRowStackView.arrangedSubviews.isEmpty ? 0 : spacing) + buttonWidth
+            
+            if neededWidth > containerWidth && !currentRowStackView.arrangedSubviews.isEmpty {
+                // Start new row
+                currentRowStackView = createTagEditRowStackView()
+                verticalStackView.addArrangedSubview(currentRowStackView)
+                currentRowWidth = buttonWidth
+            } else {
+                currentRowWidth = neededWidth
+            }
+            
+            currentRowStackView.addArrangedSubview(tagButton)
+        }
+    }
+    
+    private func createTagEditRowStackView() -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .leading
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }
+    
+    private func createTagEditButton(title: String) -> UIButton {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 1.0) :
+                UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+        }
+        button.layer.cornerRadius = 16
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
+                UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
+        }, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+        button.addTarget(self, action: #selector(tagEditButtonTapped(_:)), for: .touchUpInside)
+        
+        NSLayoutConstraint.activate([
+            button.heightAnchor.constraint(equalToConstant: 32)
+        ])
+        
+        return button
     }
     
     private func setupJournalSection() {
@@ -519,12 +689,33 @@ class MoodEntryDetailViewController: UIViewController {
             
             tagsLabel.topAnchor.constraint(equalTo: tagsCardView.topAnchor, constant: 20),
             tagsLabel.leadingAnchor.constraint(equalTo: tagsCardView.leadingAnchor, constant: 20),
+            tagsLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 60),
+            tagsLabel.heightAnchor.constraint(equalToConstant: 30),
             
-            tagsStackView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 16),
+            tagsEditButton.topAnchor.constraint(equalTo: tagsCardView.topAnchor, constant: 20),
+            tagsEditButton.trailingAnchor.constraint(equalTo: tagsCardView.trailingAnchor, constant: -20),
+            tagsEditButton.widthAnchor.constraint(equalToConstant: 24),
+            tagsEditButton.heightAnchor.constraint(equalToConstant: 24),
+            
+            tagsStackView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 24),
             tagsStackView.leadingAnchor.constraint(equalTo: tagsCardView.leadingAnchor, constant: 20),
-            tagsStackView.trailingAnchor.constraint(equalTo: tagsCardView.trailingAnchor, constant: -20),
+            tagsStackView.trailingAnchor.constraint(lessThanOrEqualTo: tagsCardView.trailingAnchor, constant: -20),
             tagsStackView.bottomAnchor.constraint(equalTo: tagsCardView.bottomAnchor, constant: -20),
             
+            tagsEditContainerView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 24),
+            tagsEditContainerView.leadingAnchor.constraint(equalTo: tagsCardView.leadingAnchor, constant: 20),
+            tagsEditContainerView.trailingAnchor.constraint(lessThanOrEqualTo: tagsCardView.trailingAnchor, constant: -20),
+            
+            tagsEditButtonsStackView.topAnchor.constraint(equalTo: tagsEditContainerView.bottomAnchor, constant: 16),
+            tagsEditButtonsStackView.centerXAnchor.constraint(equalTo: tagsCardView.centerXAnchor),
+            tagsEditButtonsStackView.bottomAnchor.constraint(equalTo: tagsCardView.bottomAnchor, constant: -20),
+        ])
+        
+        // Set initial height constraint for tags card (will be updated dynamically)
+        tagsCardHeightConstraint = tagsCardView.heightAnchor.constraint(greaterThanOrEqualToConstant: 110)
+        tagsCardHeightConstraint?.isActive = true
+        
+        NSLayoutConstraint.activate([
             // Journal Card
             journalCardView.topAnchor.constraint(equalTo: tagsCardView.bottomAnchor, constant: 20),
             journalCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -633,7 +824,10 @@ class MoodEntryDetailViewController: UIViewController {
         originalJournalText = moodEntry.journalText
         
         // Configure tags
+        originalTags = Set(moodEntry.tags)
+        selectedTags = Set(moodEntry.tags)
         setupTags()
+        updateTagEditButtons()
         
         // Configure voice journal
         configureVoiceJournal()
@@ -663,12 +857,58 @@ class MoodEntryDetailViewController: UIViewController {
         // Clear existing tags
         tagsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
+        // Always show tags card
+        tagsCardView.isHidden = false
+        
+        if moodEntry.tags.isEmpty {
+            // Create compact empty state
+            setupEmptyTagsState()
+            return
+        }
+        
+        // Setup tags with dynamic sizing
+        setupTagsWithContent()
+    }
+    
+    private func setupEmptyTagsState() {
+        // Add "No tags" message (keeping it simple like journal entry when empty)
+        let noTagsLabel = UILabel()
+        noTagsLabel.text = "No tags added"
+        noTagsLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        noTagsLabel.textColor = UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ?
+                UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) :
+                UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        }
+        noTagsLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Configure main stack view for vertical layout (consistent with content state)
+        tagsStackView.axis = .vertical
+        tagsStackView.spacing = 8
+        tagsStackView.alignment = .leading
+        tagsStackView.distribution = .fill
+        
+        tagsStackView.addArrangedSubview(noTagsLabel)
+        
+        // Update height constraint for compact size
+        updateTagsCardHeight()
+    }
+    
+    private func setupTagsWithContent() {
         let tagColors: [(background: UIColor, text: UIColor)] = [
             (UIColor(red: 0.85, green: 0.78, blue: 0.68, alpha: 0.8), UIColor(red: 0.4, green: 0.35, blue: 0.25, alpha: 1.0)),
             (UIColor(red: 0.82, green: 0.72, blue: 0.8, alpha: 0.8), UIColor(red: 0.4, green: 0.3, blue: 0.38, alpha: 1.0)),
             (UIColor(red: 0.88, green: 0.83, blue: 0.75, alpha: 0.8), UIColor(red: 0.38, green: 0.33, blue: 0.28, alpha: 1.0)),
             (UIColor(red: 0.78, green: 0.85, blue: 0.75, alpha: 0.8), UIColor(red: 0.3, green: 0.4, blue: 0.28, alpha: 1.0))
         ]
+        
+        // Create a container to hold tag buttons with proper flow layout
+        let containerWidth = UIScreen.main.bounds.width - 72 // Account for card margins (16*2 + 20*2)
+        let spacing: CGFloat = 12
+        var currentRowWidth: CGFloat = 0
+        var rowViews: [UIStackView] = []
+        var currentRowStackView = createRowStackView()
+        rowViews.append(currentRowStackView)
         
         for (index, tag) in moodEntry.tags.enumerated() {
             let tagButton = UIButton(type: .custom)
@@ -690,14 +930,158 @@ class MoodEntryDetailViewController: UIViewController {
             tagButton.translatesAutoresizingMaskIntoConstraints = false
             tagButton.heightAnchor.constraint(equalToConstant: 36).isActive = true
             
-            tagsStackView.addArrangedSubview(tagButton)
+            // Calculate button width
+            let buttonSize = tagButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 36))
+            let buttonWidth = buttonSize.width
+            
+            // Check if button fits in current row
+            let neededWidth = currentRowWidth + (currentRowStackView.arrangedSubviews.isEmpty ? 0 : spacing) + buttonWidth
+            
+            if neededWidth > containerWidth && !currentRowStackView.arrangedSubviews.isEmpty {
+                // Start new row
+                currentRowStackView = createRowStackView()
+                rowViews.append(currentRowStackView)
+                currentRowWidth = buttonWidth
+            } else {
+                currentRowWidth = neededWidth
+            }
+            
+            currentRowStackView.addArrangedSubview(tagButton)
         }
+        
+        // Add all row stack views to the main tags stack view
+        tagsStackView.axis = .vertical
+        tagsStackView.spacing = 8
+        tagsStackView.alignment = .leading
+        tagsStackView.distribution = .fill
+        
+        for rowStackView in rowViews {
+            tagsStackView.addArrangedSubview(rowStackView)
+        }
+        
+        // Update height constraint to grow with content
+        updateTagsCardHeight()
+    }
+    
+    private func updateTagsCardHeight(isEditingMode: Bool = false) {
+        // Remove existing constraint
+        tagsCardHeightConstraint?.isActive = false
+        
+        // Calculate the exact height needed based on content
+        let calculatedHeight = calculateRequiredHeight(isEditingMode: isEditingMode)
+        tagsCardHeightConstraint = tagsCardView.heightAnchor.constraint(equalToConstant: calculatedHeight)
+        tagsCardHeightConstraint?.isActive = true
+        
+        // Animate the height change
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.layoutIfNeeded()
+        })
+    }
+    
+    private func calculateRequiredHeight(isEditingMode: Bool = false) -> CGFloat {
+        let topPadding: CGFloat = 20      // tagsLabel top margin
+        let labelHeight: CGFloat = 30     // tagsLabel height (20pt semibold font needs more space)
+        let labelToContentSpacing: CGFloat = 24  // increased spacing between label and tags
+        let bottomPadding: CGFloat = 20   // bottom margin
+        
+        if isEditingMode {
+            // For editing mode, calculate height for tag selection buttons (8 tags in 2-3 rows typically)
+            let editTagHeight: CGFloat = 32   // Height of edit tag buttons
+            let editTagSpacing: CGFloat = 8   // Spacing between edit tags
+            let editRowSpacing: CGFloat = 8   // Spacing between rows
+            let saveButtonsHeight: CGFloat = 44  // Height of save/cancel buttons
+            let saveButtonsSpacing: CGFloat = 16 // Spacing above save buttons
+            
+            let availableTags = ["Work", "Sleep", "Family", "Social", "Self-care", "Exercise", "Creativity", "Stress"]
+            let containerWidth = UIScreen.main.bounds.width - 72
+            
+            // Calculate rows needed for editing tags
+            var currentRowWidth: CGFloat = 0
+            var numberOfRows: Int = 1
+            
+            for tag in availableTags {
+                let tempButton = UIButton()
+                tempButton.setTitle(tag, for: .normal)
+                tempButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+                tempButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+                
+                let buttonSize = tempButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: editTagHeight))
+                let buttonWidth = buttonSize.width
+                
+                let neededWidth = currentRowWidth + (currentRowWidth > 0 ? editTagSpacing : 0) + buttonWidth
+                
+                if neededWidth > containerWidth && currentRowWidth > 0 {
+                    numberOfRows += 1
+                    currentRowWidth = buttonWidth
+                } else {
+                    currentRowWidth = neededWidth
+                }
+            }
+            
+            let editTagsHeight = CGFloat(numberOfRows) * editTagHeight + CGFloat(numberOfRows - 1) * editRowSpacing
+            return topPadding + labelHeight + labelToContentSpacing + editTagsHeight + saveButtonsSpacing + saveButtonsHeight + bottomPadding
+            
+        } else if moodEntry.tags.isEmpty {
+            // Empty state: ensure minimum height to show header + content
+            let emptyStateHeight: CGFloat = 20  // Height of "No tags added" text
+            let calculatedHeight = topPadding + labelHeight + labelToContentSpacing + emptyStateHeight + bottomPadding
+            return max(calculatedHeight, 110) // Ensure minimum 110pt height for header space
+        } else {
+            // Calculate height based on number of tag rows
+            let containerWidth = UIScreen.main.bounds.width - 72 // Account for card margins (16*2 + 20*2)
+            let tagSpacing: CGFloat = 12
+            let tagRowHeight: CGFloat = 36  // Height of tag buttons
+            let rowSpacing: CGFloat = 8     // Spacing between rows
+            
+            // Calculate how many rows we need
+            var currentRowWidth: CGFloat = 0
+            var numberOfRows: Int = 1
+            
+            for tag in moodEntry.tags {
+                // Create a temporary button to measure size
+                let tempButton = UIButton()
+                tempButton.setTitle(tag, for: .normal)
+                tempButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+                tempButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
+                
+                let buttonSize = tempButton.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: tagRowHeight))
+                let buttonWidth = buttonSize.width
+                
+                // Check if button fits in current row
+                let neededWidth = currentRowWidth + (currentRowWidth > 0 ? tagSpacing : 0) + buttonWidth
+                
+                if neededWidth > containerWidth && currentRowWidth > 0 {
+                    // Start new row
+                    numberOfRows += 1
+                    currentRowWidth = buttonWidth
+                } else {
+                    currentRowWidth = neededWidth
+                }
+            }
+            
+            // Calculate total content height
+            let tagsContentHeight = CGFloat(numberOfRows) * tagRowHeight + CGFloat(numberOfRows - 1) * rowSpacing
+            let calculatedHeight = topPadding + labelHeight + labelToContentSpacing + tagsContentHeight + bottomPadding
+            return max(calculatedHeight, 110) // Ensure minimum height to show header
+        }
+    }
+    
+    private func createRowStackView() -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 12
+        stackView.alignment = .leading
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }
     
     // MARK: - Actions
     @objc private func backButtonTapped() {
         if isEditingJournal {
             cancelEditing()
+        } else if isEditingTags {
+            cancelTagsEditing()
         } else {
             navigationController?.popViewController(animated: true)
         }
@@ -782,6 +1166,40 @@ class MoodEntryDetailViewController: UIViewController {
         view.endEditing(true)
     }
     
+    @objc private func tagsEditButtonTapped() {
+        toggleTagsEditingMode()
+    }
+    
+    @objc private func tagsSaveButtonTapped() {
+        saveTagsChanges()
+    }
+    
+    @objc private func tagsCancelButtonTapped() {
+        cancelTagsEditing()
+    }
+    
+    @objc private func tagEditButtonTapped(_ sender: UIButton) {
+        guard let title = sender.title(for: .normal) else { return }
+        
+        if selectedTags.contains(title) {
+            selectedTags.remove(title)
+            sender.backgroundColor = UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ?
+                    UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 1.0) :
+                    UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+            }
+            sender.setTitleColor(UIColor { traitCollection in
+                return traitCollection.userInterfaceStyle == .dark ?
+                    UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
+                    UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
+            }, for: .normal)
+        } else {
+            selectedTags.insert(title)
+            sender.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+            sender.setTitleColor(UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0), for: .normal)
+        }
+    }
+    
     // MARK: - Editing Methods
     private func toggleEditingMode() {
         isEditingJournal.toggle()
@@ -790,6 +1208,179 @@ class MoodEntryDetailViewController: UIViewController {
             startEditing()
         } else {
             cancelEditing()
+        }
+    }
+    
+    private func toggleTagsEditingMode() {
+        isEditingTags.toggle()
+        
+        if isEditingTags {
+            startTagsEditing()
+        } else {
+            cancelTagsEditing()
+        }
+    }
+    
+    private func startTagsEditing() {
+        selectedTags = Set(originalTags)
+        updateTagEditButtons()
+        
+        // Ensure adequate height for editing mode
+        updateTagsCardHeight(isEditingMode: true)
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.tagsStackView.alpha = 0
+            // Keep tags label and edit button visible during transition
+        }) { _ in
+            self.tagsStackView.isHidden = true
+            // Don't hide the tagsEditButton - keep it visible
+            
+            self.tagsEditContainerView.isHidden = false
+            self.tagsEditContainerView.alpha = 0
+            self.tagsEditButtonsStackView.isHidden = false
+            
+            UIView.animate(withDuration: 0.3) {
+                self.tagsEditContainerView.alpha = 1
+                self.tagsEditButtonsStackView.alpha = 1
+                
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
+    private func cancelTagsEditing() {
+        selectedTags = Set(originalTags)
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.tagsEditContainerView.alpha = 0
+            self.tagsEditButtonsStackView.alpha = 0
+        }) { _ in
+            self.tagsEditContainerView.isHidden = true
+            self.tagsEditButtonsStackView.isHidden = true
+            
+            self.tagsStackView.isHidden = false
+            // Tags label and edit button should already be visible
+            self.tagsStackView.alpha = 0
+            
+            // Restore correct height based on current tags
+            self.updateTagsCardHeight()
+            
+            UIView.animate(withDuration: 0.3) {
+                self.tagsStackView.alpha = 1
+                
+                self.view.layoutIfNeeded()
+            }
+        }
+        
+        isEditingTags = false
+    }
+    
+    private func saveTagsChanges() {
+        let newTagsArray = Array(selectedTags)
+        
+        // Update the mood entry with new tags
+        let success = dataManager.saveMoodEntry(
+            emoji: moodEntry.emoji,
+            moodLabel: moodEntry.moodLabel,
+            journalText: moodEntry.journalText,
+            tags: newTagsArray,
+            voiceRecordingPath: dataManager.getVoiceRecordingPath(for: moodEntry.date),
+            voiceRecordingDuration: dataManager.getVoiceRecordingDuration(for: moodEntry.date)
+        )
+        
+        if success {
+            // Update local mood entry object
+            let updatedEntry = MoodEntry(
+                id: moodEntry.id,
+                date: moodEntry.date,
+                emoji: moodEntry.emoji,
+                moodLabel: moodEntry.moodLabel,
+                journalText: moodEntry.journalText,
+                tags: newTagsArray
+            )
+            self.moodEntry = updatedEntry
+            
+            // Update original tags
+            originalTags = selectedTags
+            
+            // Update tags display (this will also update the height)
+            setupTags()
+            
+            // Notify delegate about the update
+            delegate?.moodEntryDidUpdate(updatedEntry)
+            
+            // Show success feedback
+            showTagsSaveSuccess()
+            
+        } else {
+            // Show error alert
+            let alert = UIAlertController(title: "Save Failed", message: "Could not save tags. Please try again.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        }
+        
+        // Exit editing mode
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.cancelTagsEditing()
+        }
+    }
+    
+    private func updateTagEditButtons() {
+        let availableTags = ["Work", "Sleep", "Family", "Social", "Self-care", "Exercise", "Creativity", "Stress"]
+        
+        for (index, tag) in availableTags.enumerated() {
+            if index < tagEditButtons.count {
+                let button = tagEditButtons[index]
+                if selectedTags.contains(tag) {
+                    button.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 0.3)
+                    button.setTitleColor(UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0), for: .normal)
+                } else {
+                    button.backgroundColor = UIColor { traitCollection in
+                        return traitCollection.userInterfaceStyle == .dark ?
+                            UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 1.0) :
+                            UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+                    }
+                    button.setTitleColor(UIColor { traitCollection in
+                        return traitCollection.userInterfaceStyle == .dark ?
+                            UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
+                            UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
+                    }, for: .normal)
+                }
+            }
+        }
+    }
+    
+    private func showTagsSaveSuccess() {
+        // Create temporary success label
+        let successLabel = UILabel()
+        successLabel.text = "✅ Tags Saved"
+        successLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        successLabel.textColor = UIColor(red: 0.2, green: 0.7, blue: 0.2, alpha: 1.0)
+        successLabel.backgroundColor = UIColor(red: 0.9, green: 0.95, blue: 0.9, alpha: 0.9)
+        successLabel.textAlignment = .center
+        successLabel.layer.cornerRadius = 12
+        successLabel.clipsToBounds = true
+        successLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(successLabel)
+        
+        NSLayoutConstraint.activate([
+            successLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            successLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            successLabel.widthAnchor.constraint(equalToConstant: 120),
+            successLabel.heightAnchor.constraint(equalToConstant: 32)
+        ])
+        
+        // Animate in and out
+        successLabel.alpha = 0
+        UIView.animate(withDuration: 0.3, animations: {
+            successLabel.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 1.5, animations: {
+                successLabel.alpha = 0
+            }) { _ in
+                successLabel.removeFromSuperview()
+            }
         }
     }
     
