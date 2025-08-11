@@ -29,6 +29,7 @@
 		BE9339EF2E2FEF8100D1C95C /* irisOneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */; };
 		BE9339F12E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */; };
 		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
+		BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */; };
 		BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */; };
 		BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105292E411CBA00235A60 /* SettingsViewController.swift */; };
 		BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105CB2E440D4700235A60 /* MoodDataManager.swift */; };
@@ -79,6 +80,7 @@
 		BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITests.swift; sourceTree = "<group>"; };
 		BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
+		BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "sleep music.mp3"; sourceTree = "<group>"; };
 		BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailViewController.swift; sourceTree = "<group>"; };
 		BED105292E411CBA00235A60 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		BED105CB2E440D4700235A60 /* MoodDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoodDataManager.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */,
 				BED105292E411CBA00235A60 /* SettingsViewController.swift */,
 				BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */,
 				BE6EBB992E36A8B2004F4D5A /* ImmersiveChatViewController.swift */,
@@ -282,6 +285,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */,
 				BE9339DA2E2FEF8000D1C95C /* LaunchScreen.storyboard in Resources */,
 				BE9339D72E2FEF8000D1C95C /* Assets.xcassets in Resources */,
 				BE9339D52E2FEF7D00D1C95C /* Main.storyboard in Resources */,
