@@ -72,14 +72,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // MARK: - Helper Methods
     private func determineInitialViewController() -> UIViewController {
-        // TODO: Check for existing user authentication here
-        // For now, always show login screen
-        // In the future: if user is logged in, go directly to CustomTabBarController()
+        // Check if user has completed onboarding
+        let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
 
-        let initialViewController = LoginViewController()
-        let navController = UINavigationController(rootViewController: initialViewController)
-        navController.isNavigationBarHidden = true
-        return navController
+        if hasCompletedOnboarding {
+            // User has completed onboarding - go directly to main app
+            let tabBarController = CustomTabBarController()
+            let navController = UINavigationController(rootViewController: tabBarController)
+            navController.isNavigationBarHidden = true
+
+            // Select chat tab as default
+            DispatchQueue.main.async {
+                tabBarController.selectTab(at: 2)
+            }
+
+            return navController
+        } else {
+            // First time user - show login/onboarding flow
+            let initialViewController = LoginViewController()
+            let navController = UINavigationController(rootViewController: initialViewController)
+            navController.isNavigationBarHidden = true
+            return navController
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

@@ -397,6 +397,10 @@ class WelcomeViewController: UIViewController {
     
     @objc private func startJourneyButtonTapped() {
         if isPersonalized {
+            // Mark onboarding as completed
+            UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+            UserDefaults.standard.synchronize()
+
             // Navigate to main app with chat tab selected
             let tabBarController = CustomTabBarController()
             tabBarController.modalPresentationStyle = .fullScreen

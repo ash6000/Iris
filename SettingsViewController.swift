@@ -16,7 +16,6 @@ class SettingsViewController: UIViewController {
 
     // Header
     private let headerView = UIView()
-    private let backButton = UIButton()
     private let titleLabel = UILabel()
 
     // Profile Section
@@ -40,6 +39,11 @@ class SettingsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+
+        // Ensure tab bar is visible when returning to settings
+        if let tabBarController = self.tabBarController {
+            tabBarController.tabBar.isHidden = false
+        }
     }
 
     // MARK: - Setup Methods
@@ -62,14 +66,9 @@ class SettingsViewController: UIViewController {
 
     private func setupHeader() {
         headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.backgroundColor = UIColor.white
-        contentView.addSubview(headerView)
+        headerView.backgroundColor = UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+        view.addSubview(headerView)
 
-        // Back Button
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-        backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        backButton.tintColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
-        headerView.addSubview(backButton)
 
         // Title Label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -227,6 +226,13 @@ class SettingsViewController: UIViewController {
         let itemView = UIView()
         itemView.translatesAutoresizingMaskIntoConstraints = false
 
+        // Add tap gesture for non-toggle items
+        if !item.hasToggle {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(settingsItemTapped(_:)))
+            itemView.addGestureRecognizer(tapGesture)
+            itemView.isUserInteractionEnabled = true
+        }
+
         // Icon Background
         let iconBackground = UIView()
         iconBackground.translatesAutoresizingMaskIntoConstraints = false
@@ -365,7 +371,7 @@ class SettingsViewController: UIViewController {
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // Scroll View
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -378,21 +384,17 @@ class SettingsViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
             // Header
-            headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 60),
 
-            backButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
-            backButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            backButton.widthAnchor.constraint(equalToConstant: 24),
-            backButton.heightAnchor.constraint(equalToConstant: 24),
 
             titleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
 
             // Profile View
-            profileView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 16),
+            profileView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             profileView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             profileView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             profileView.heightAnchor.constraint(equalToConstant: 80),
@@ -424,12 +426,87 @@ class SettingsViewController: UIViewController {
     }
 
     private func setupActions() {
-        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        // Add tap gesture to profile view
+        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileViewTapped))
+        profileView.addGestureRecognizer(profileTapGesture)
+        profileView.isUserInteractionEnabled = true
     }
 
-    // MARK: - Actions
-    @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
+    // MARK: - Action Methods
+    @objc private func profileViewTapped() {
+        let profileViewController = ProfileViewController()
+        navigationController?.pushViewController(profileViewController, animated: true)
+    }
+
+    @objc private func settingsItemTapped(_ gesture: UITapGestureRecognizer) {
+        guard let itemView = gesture.view else { return }
+
+        // Find the title label to identify which item was tapped
+        for subview in itemView.subviews {
+            if let titleLabel = subview as? UILabel,
+               let title = titleLabel.text {
+                handleSettingsItemTap(title: title)
+                break
+            }
+        }
+    }
+
+    private func handleSettingsItemTap(title: String) {
+        switch title {
+        case "Sign Out":
+            showSignOutConfirmation()
+        case "Privacy & Security":
+            // Handle privacy settings
+            print("Privacy & Security tapped")
+        case "Export Data":
+            // Handle data export
+            print("Export Data tapped")
+        case "Help & Support":
+            // Handle help
+            print("Help & Support tapped")
+        case "Theme & Appearance":
+            // Handle theme settings
+            print("Theme & Appearance tapped")
+        case "Language":
+            // Handle language settings
+            print("Language tapped")
+        case "Quiet Hours":
+            // Handle quiet hours settings
+            print("Quiet Hours tapped")
+        default:
+            print("Unknown settings item tapped: \(title)")
+        }
+    }
+
+    private func showSignOutConfirmation() {
+        let alert = UIAlertController(
+            title: "Sign Out",
+            message: "Are you sure you want to sign out? You'll need to go through the onboarding process again.",
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Sign Out", style: .destructive) { _ in
+            self.performSignOut()
+        })
+
+        present(alert, animated: true)
+    }
+
+    private func performSignOut() {
+        // Reset onboarding completion flag
+        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+        UserDefaults.standard.synchronize()
+
+        // Navigate back to the first step of onboarding
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            let createProfileViewController = CreateProfileViewController()
+
+            UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                window.rootViewController = createProfileViewController
+            }, completion: nil)
+        }
     }
 }
 
