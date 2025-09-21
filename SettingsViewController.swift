@@ -7,30 +7,28 @@
 import UIKit
 
 class SettingsViewController: UIViewController {
-    
+
     // MARK: - Properties
-    
+
     // UI Components
     private let scrollView = UIScrollView()
     private let contentView = UIView()
-    
+
     // Header
     private let headerView = UIView()
     private let backButton = UIButton()
     private let titleLabel = UILabel()
-    
-    // Cards Stack View
-    private let cardsStackView = UIStackView()
-    
-    // Individual Cards
-    private let welcomeCard = UIView()
-    private let aboutIrisCard = UIView()
-    private let termsCard = UIView()
-    private let upgradeCard = UIView()
-    private let privacyCard = UIView()
-    private let supportCard = UIView()
-    private let ambassadorCard = UIView()  // Combined ambassador card
-    
+
+    // Profile Section
+    private let profileView = UIView()
+    private let profileImageView = UIImageView()
+    private let nameLabel = UILabel()
+    private let memberLabel = UILabel()
+    private let profileArrowImageView = UIImageView()
+
+    // Sections Stack View
+    private let sectionsStackView = UIStackView()
+
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,662 +36,416 @@ class SettingsViewController: UIViewController {
         setupConstraints()
         setupActions()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    // MARK: - UI Setup
+
+    // MARK: - Setup Methods
     private func setupUI() {
-        view.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.12, green: 0.12, blue: 0.12, alpha: 1.0) :
-                UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
-        }
-        
-        setupScrollView()
-        setupHeader()
-        setupCardsStackView()
-        setupCards()
-    }
-    
-    private func setupScrollView() {
+        view.backgroundColor = UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+
+        // Scroll View
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.contentInsetAdjustmentBehavior = .automatic
         view.addSubview(scrollView)
-        
+
+        // Content View
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
+
+        setupHeader()
+        setupProfileSection()
+        setupSections()
     }
-    
+
     private func setupHeader() {
         headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.12, green: 0.12, blue: 0.12, alpha: 1.0) :
-                UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
-        }
+        headerView.backgroundColor = UIColor.white
         contentView.addSubview(headerView)
-        
-        // Title (centered, no back button)
+
+        // Back Button
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
+        backButton.tintColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+        headerView.addSubview(backButton)
+
+        // Title Label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Settings & More"
-        titleLabel.font = UIFont(name: "Georgia", size: 28) ?? UIFont.systemFont(ofSize: 28, weight: .semibold)
-        titleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0) :
-                UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
-        }
+        titleLabel.text = "Settings"
+        titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
         titleLabel.textAlignment = .center
         headerView.addSubview(titleLabel)
     }
-    
-    private func setupCardsStackView() {
-        cardsStackView.translatesAutoresizingMaskIntoConstraints = false
-        cardsStackView.axis = .vertical
-        cardsStackView.spacing = 12  // Reduced spacing to match original
-        cardsStackView.distribution = .fill
-        cardsStackView.alignment = .fill
-        contentView.addSubview(cardsStackView)
+
+    private func setupProfileSection() {
+        profileView.translatesAutoresizingMaskIntoConstraints = false
+        profileView.backgroundColor = UIColor.white
+        profileView.layer.cornerRadius = 12
+        contentView.addSubview(profileView)
+
+        // Profile Image
+        profileImageView.translatesAutoresizingMaskIntoConstraints = false
+        profileImageView.image = UIImage(systemName: "person.circle.fill")
+        profileImageView.tintColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        profileImageView.contentMode = .scaleAspectFit
+        profileView.addSubview(profileImageView)
+
+        // Name Label
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.text = "Sarah Chen"
+        nameLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        nameLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+        profileView.addSubview(nameLabel)
+
+        // Member Label
+        memberLabel.translatesAutoresizingMaskIntoConstraints = false
+        memberLabel.text = "Member since January 2025"
+        memberLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        memberLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        profileView.addSubview(memberLabel)
+
+        // Arrow
+        profileArrowImageView.translatesAutoresizingMaskIntoConstraints = false
+        profileArrowImageView.image = UIImage(systemName: "chevron.right")
+        profileArrowImageView.tintColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        profileView.addSubview(profileArrowImageView)
     }
-    
-    private func setupCards() {
-        setupWelcomeCard()
-        setupAboutIrisCard()
-        setupTermsCard()
-        setupUpgradeCard()
-        setupPrivacyCard()
-        setupSupportCard()
-        setupAmbassadorCard()  // Full ambassador card at the end
-        
-        // Add cards to stack view
-        cardsStackView.addArrangedSubview(welcomeCard)
-        cardsStackView.addArrangedSubview(aboutIrisCard)
-        cardsStackView.addArrangedSubview(termsCard)
-        cardsStackView.addArrangedSubview(upgradeCard)
-        cardsStackView.addArrangedSubview(privacyCard)
-        cardsStackView.addArrangedSubview(supportCard)
-        cardsStackView.addArrangedSubview(ambassadorCard)  // Last card
-    }
-    
-    private func setupWelcomeCard() {
-        welcomeCard.translatesAutoresizingMaskIntoConstraints = false
-        welcomeCard.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0) :
-                UIColor(red: 0.925, green: 0.91, blue: 0.895, alpha: 1.0)
-        }
-        welcomeCard.layer.cornerRadius = 20
-        welcomeCard.layer.shadowColor = UIColor.black.cgColor
-        welcomeCard.layer.shadowOpacity = 0.08
-        welcomeCard.layer.shadowRadius = 8
-        welcomeCard.layer.shadowOffset = CGSize(width: 0, height: 3)
-        
-        // Icon background (lavender circle)
-        let iconBackground = UIView()
-        iconBackground.translatesAutoresizingMaskIntoConstraints = false
-        iconBackground.backgroundColor = UIColor(red: 0.8, green: 0.75, blue: 0.9, alpha: 1.0)
-        iconBackground.layer.cornerRadius = 25
-        welcomeCard.addSubview(iconBackground)
-        
-        // Heart icon
-        let heartIcon = UIImageView()
-        heartIcon.translatesAutoresizingMaskIntoConstraints = false
-        heartIcon.image = UIImage(systemName: "heart.fill")
-        heartIcon.tintColor = UIColor(red: 0.6, green: 0.5, blue: 0.8, alpha: 1.0)
-        iconBackground.addSubview(heartIcon)
-        
-        // Title
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Welcome back"
-        titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        titleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0) :
-                UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1.0)
-        }
-        titleLabel.numberOfLines = 0
-        titleLabel.lineBreakMode = .byWordWrapping
-        welcomeCard.addSubview(titleLabel)
-        
-        // Subtitle
-        let subtitleLabel = UILabel()
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.text = "Free tier • 3 tokens remaining today"
-        subtitleLabel.font = UIFont.systemFont(ofSize: 15, weight: .regular)
-        subtitleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
-                UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
-        }
-        subtitleLabel.numberOfLines = 0
-        subtitleLabel.lineBreakMode = .byWordWrapping
-        welcomeCard.addSubview(subtitleLabel)
-        
-        NSLayoutConstraint.activate([
-            welcomeCard.heightAnchor.constraint(greaterThanOrEqualToConstant: 90),  // Allow dynamic height
-            
-            iconBackground.leadingAnchor.constraint(equalTo: welcomeCard.leadingAnchor, constant: 16),  // Reduced padding
-            iconBackground.centerYAnchor.constraint(equalTo: welcomeCard.centerYAnchor),
-            iconBackground.widthAnchor.constraint(equalToConstant: 50),
-            iconBackground.heightAnchor.constraint(equalToConstant: 50),
-            
-            heartIcon.centerXAnchor.constraint(equalTo: iconBackground.centerXAnchor),
-            heartIcon.centerYAnchor.constraint(equalTo: iconBackground.centerYAnchor),
-            heartIcon.widthAnchor.constraint(equalToConstant: 24),
-            heartIcon.heightAnchor.constraint(equalToConstant: 24),
-            
-            titleLabel.topAnchor.constraint(equalTo: welcomeCard.topAnchor, constant: 16),  // Reduced padding
-            titleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),  // Reduced spacing
-            titleLabel.trailingAnchor.constraint(equalTo: welcomeCard.trailingAnchor, constant: -16),
-            
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            subtitleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),
-            subtitleLabel.trailingAnchor.constraint(equalTo: welcomeCard.trailingAnchor, constant: -16),
-            subtitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: welcomeCard.bottomAnchor, constant: -16)
+
+    private func setupSections() {
+        sectionsStackView.translatesAutoresizingMaskIntoConstraints = false
+        sectionsStackView.axis = .vertical
+        sectionsStackView.spacing = 24
+        contentView.addSubview(sectionsStackView)
+
+        // Notifications Section
+        let notificationsSection = createSection(title: "Notifications", items: [
+            SettingsItem(icon: "bell.fill", title: "Daily Reminders", subtitle: "Meditation and reflection prompts", hasToggle: true, isToggleOn: true),
+            SettingsItem(icon: "message.fill", title: "AI Companion Messages", subtitle: "Guidance and wisdom sharing", hasToggle: true, isToggleOn: true),
+            SettingsItem(icon: "star.fill", title: "Weekly Insights", subtitle: "Progress and spiritual growth updates", hasToggle: true, isToggleOn: false)
         ])
-    }
-    
-    private func setupAboutIrisCard() {
-        aboutIrisCard.translatesAutoresizingMaskIntoConstraints = false
-        createStandardCard(
-            card: aboutIrisCard,
-            iconName: "info.circle",
-            iconColor: UIColor(red: 0.9, green: 0.6, blue: 0.7, alpha: 1.0),
-            title: "About Iris",
-            subtitle: "Learn about your AI companion"
-        )
-    }
-    
-    private func setupTermsCard() {
-        termsCard.translatesAutoresizingMaskIntoConstraints = false
-        createStandardCard(
-            card: termsCard,
-            iconName: "doc.text",
-            iconColor: UIColor(red: 0.9, green: 0.6, blue: 0.7, alpha: 1.0),
-            title: "Terms of Use & Disclaimer",
-            subtitle: "Important information about using Iris"
-        )
-    }
-    
-    private func setupUpgradeCard() {
-        upgradeCard.translatesAutoresizingMaskIntoConstraints = false
-        upgradeCard.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.25, green: 0.2, blue: 0.25, alpha: 1.0) :
-                UIColor(red: 0.925, green: 0.91, blue: 0.895, alpha: 1.0)
-        }
-        upgradeCard.layer.cornerRadius = 20
-        upgradeCard.layer.shadowColor = UIColor.black.cgColor
-        upgradeCard.layer.shadowOpacity = 0.08
-        upgradeCard.layer.shadowRadius = 8
-        upgradeCard.layer.shadowOffset = CGSize(width: 0, height: 3)
-        
-        // Add subtle gradient overlay for premium feel
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = CGRect(x: 0, y: 0, width: 1000, height: 80) // Will be adjusted
-        gradientLayer.colors = [
-            UIColor(red: 0.95, green: 0.85, blue: 0.9, alpha: 0.3).cgColor,
-            UIColor(red: 0.9, green: 0.8, blue: 0.85, alpha: 0.1).cgColor
-        ]
-        gradientLayer.cornerRadius = 20
-        upgradeCard.layer.insertSublayer(gradientLayer, at: 0)
-        
-        // Icon background (lavender circle)
-        let iconBackground = UIView()
-        iconBackground.translatesAutoresizingMaskIntoConstraints = false
-        iconBackground.backgroundColor = UIColor(red: 0.8, green: 0.75, blue: 0.9, alpha: 1.0)
-        iconBackground.layer.cornerRadius = 25
-        upgradeCard.addSubview(iconBackground)
-        
-        // Crown icon
-        let crownIcon = UIImageView()
-        crownIcon.translatesAutoresizingMaskIntoConstraints = false
-        crownIcon.image = UIImage(systemName: "crown.fill")
-        crownIcon.tintColor = UIColor(red: 0.6, green: 0.5, blue: 0.8, alpha: 1.0)
-        iconBackground.addSubview(crownIcon)
-        
-        // Title
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Upgrade to Premium"
-        titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        titleLabel.textColor = UIColor(red: 0.75, green: 0.5, blue: 0.7, alpha: 1.0) // Pink title
-        titleLabel.numberOfLines = 0
-        titleLabel.lineBreakMode = .byWordWrapping
-        upgradeCard.addSubview(titleLabel)
-        
-        // Subtitle
-        let subtitleLabel = UILabel()
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.text = "Unlock unlimited conversations & features"
-        subtitleLabel.font = UIFont.systemFont(ofSize: 15, weight: .regular)
-        subtitleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
-                UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
-        }
-        subtitleLabel.numberOfLines = 0
-        subtitleLabel.lineBreakMode = .byWordWrapping
-        upgradeCard.addSubview(subtitleLabel)
-        
-        NSLayoutConstraint.activate([
-            upgradeCard.heightAnchor.constraint(greaterThanOrEqualToConstant: 90),  // Allow dynamic height
-            
-            iconBackground.leadingAnchor.constraint(equalTo: upgradeCard.leadingAnchor, constant: 16),  // Reduced padding
-            iconBackground.centerYAnchor.constraint(equalTo: upgradeCard.centerYAnchor),
-            iconBackground.widthAnchor.constraint(equalToConstant: 50),
-            iconBackground.heightAnchor.constraint(equalToConstant: 50),
-            
-            crownIcon.centerXAnchor.constraint(equalTo: iconBackground.centerXAnchor),
-            crownIcon.centerYAnchor.constraint(equalTo: iconBackground.centerYAnchor),
-            crownIcon.widthAnchor.constraint(equalToConstant: 24),
-            crownIcon.heightAnchor.constraint(equalToConstant: 24),
-            
-            titleLabel.topAnchor.constraint(equalTo: upgradeCard.topAnchor, constant: 16),  // Reduced padding
-            titleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),  // Reduced spacing
-            titleLabel.trailingAnchor.constraint(equalTo: upgradeCard.trailingAnchor, constant: -16),
-            
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            subtitleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),
-            subtitleLabel.trailingAnchor.constraint(equalTo: upgradeCard.trailingAnchor, constant: -16),
-            subtitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: upgradeCard.bottomAnchor, constant: -16)
+        sectionsStackView.addArrangedSubview(notificationsSection)
+
+        // Preferences Section
+        let preferencesSection = createSection(title: "Preferences", items: [
+            SettingsItem(icon: "paintbrush.fill", title: "Theme & Appearance", subtitle: "Customize your visual experience", hasToggle: false),
+            SettingsItem(icon: "globe", title: "Language", subtitle: "English (US)", hasToggle: false),
+            SettingsItem(icon: "moon.fill", title: "Quiet Hours", subtitle: "10:00 PM - 7:00 AM", hasToggle: false)
         ])
-    }
-    
-    private func setupAmbassadorCard() {
-        ambassadorCard.translatesAutoresizingMaskIntoConstraints = false
-        ambassadorCard.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0) :
-                UIColor(red: 0.925, green: 0.91, blue: 0.895, alpha: 1.0)
-        }
-        ambassadorCard.layer.cornerRadius = 20
-        ambassadorCard.layer.shadowColor = UIColor.black.cgColor
-        ambassadorCard.layer.shadowOpacity = 0.08
-        ambassadorCard.layer.shadowRadius = 8
-        ambassadorCard.layer.shadowOffset = CGSize(width: 0, height: 3)
-        ambassadorCard.clipsToBounds = true
-        
-        // Icon background (lavender circle)
-        let iconBackground = UIView()
-        iconBackground.translatesAutoresizingMaskIntoConstraints = false
-        iconBackground.backgroundColor = UIColor(red: 0.8, green: 0.75, blue: 0.9, alpha: 1.0)
-        iconBackground.layer.cornerRadius = 25
-        ambassadorCard.addSubview(iconBackground)
-        
-        // People icon
-        let peopleIcon = UIImageView()
-        peopleIcon.translatesAutoresizingMaskIntoConstraints = false
-        peopleIcon.image = UIImage(systemName: "person.2")
-        peopleIcon.tintColor = UIColor(red: 0.6, green: 0.5, blue: 0.8, alpha: 1.0)
-        iconBackground.addSubview(peopleIcon)
-        
-        // Title
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Ambassador Program"
-        titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .semibold)
-        titleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0) :
-                UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1.0)
-        }
-        ambassadorCard.addSubview(titleLabel)
-        
-        // Description
-        let descriptionLabel = UILabel()
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.text = "Share the healing power of Iris with your community and earn rewards:"
-        descriptionLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        descriptionLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
-                UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
-        }
-        descriptionLabel.numberOfLines = 0
-        ambassadorCard.addSubview(descriptionLabel)
-        
-        // Benefits list
-        let benefitsStackView = UIStackView()
-        benefitsStackView.translatesAutoresizingMaskIntoConstraints = false
-        benefitsStackView.axis = .vertical
-        benefitsStackView.spacing = 8
-        benefitsStackView.alignment = .leading
-        ambassadorCard.addSubview(benefitsStackView)
-        
-        let benefits = [
-            "Get premium access for successful referrals",
-            "Help others on their healing journey",
-            "Build a supportive spiritual community",
-            "Earn tokens and exclusive features"
-        ]
-        
-        for benefit in benefits {
-            let bulletLabel = createBulletPoint(text: benefit)
-            benefitsStackView.addArrangedSubview(bulletLabel)
-        }
-        
-        // Join Button
-        let joinButton = UIButton()
-        joinButton.translatesAutoresizingMaskIntoConstraints = false
-        joinButton.setTitle("Join Ambassador Program", for: .normal)
-        joinButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        joinButton.setTitleColor(.white, for: .normal)
-        joinButton.backgroundColor = UIColor(red: 0.8, green: 0.75, blue: 0.9, alpha: 1.0)
-        joinButton.layer.cornerRadius = 16
-        joinButton.layer.shadowColor = UIColor.black.cgColor
-        joinButton.layer.shadowOpacity = 0.1
-        joinButton.layer.shadowRadius = 6
-        joinButton.layer.shadowOffset = CGSize(width: 0, height: 3)
-        joinButton.addTarget(self, action: #selector(joinAmbassadorProgram), for: .touchUpInside)
-        ambassadorCard.addSubview(joinButton)
-        
-        NSLayoutConstraint.activate([
-            iconBackground.topAnchor.constraint(equalTo: ambassadorCard.topAnchor, constant: 24),
-            iconBackground.leadingAnchor.constraint(equalTo: ambassadorCard.leadingAnchor, constant: 20),
-            iconBackground.widthAnchor.constraint(equalToConstant: 50),
-            iconBackground.heightAnchor.constraint(equalToConstant: 50),
-            
-            peopleIcon.centerXAnchor.constraint(equalTo: iconBackground.centerXAnchor),
-            peopleIcon.centerYAnchor.constraint(equalTo: iconBackground.centerYAnchor),
-            peopleIcon.widthAnchor.constraint(equalToConstant: 24),
-            peopleIcon.heightAnchor.constraint(equalToConstant: 24),
-            
-            titleLabel.topAnchor.constraint(equalTo: ambassadorCard.topAnchor, constant: 24),
-            titleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: ambassadorCard.trailingAnchor, constant: -20),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
-            descriptionLabel.leadingAnchor.constraint(equalTo: ambassadorCard.leadingAnchor, constant: 20),
-            descriptionLabel.trailingAnchor.constraint(equalTo: ambassadorCard.trailingAnchor, constant: -20),
-            
-            benefitsStackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 16),
-            benefitsStackView.leadingAnchor.constraint(equalTo: ambassadorCard.leadingAnchor, constant: 40),
-            benefitsStackView.trailingAnchor.constraint(equalTo: ambassadorCard.trailingAnchor, constant: -20),
-            
-            joinButton.topAnchor.constraint(equalTo: benefitsStackView.bottomAnchor, constant: 24),
-            joinButton.leadingAnchor.constraint(equalTo: ambassadorCard.leadingAnchor, constant: 20),
-            joinButton.trailingAnchor.constraint(equalTo: ambassadorCard.trailingAnchor, constant: -20),
-            joinButton.heightAnchor.constraint(equalToConstant: 50),
-            joinButton.bottomAnchor.constraint(equalTo: ambassadorCard.bottomAnchor, constant: -24)
+        sectionsStackView.addArrangedSubview(preferencesSection)
+
+        // Account Section
+        let accountSection = createSection(title: "Account", items: [
+            SettingsItem(icon: "shield.fill", title: "Privacy & Security", subtitle: nil, hasToggle: false),
+            SettingsItem(icon: "square.and.arrow.down.fill", title: "Export Data", subtitle: nil, hasToggle: false),
+            SettingsItem(icon: "questionmark.circle.fill", title: "Help & Support", subtitle: nil, hasToggle: false),
+            SettingsItem(icon: "rectangle.portrait.and.arrow.right.fill", title: "Sign Out", subtitle: nil, hasToggle: false)
         ])
+        sectionsStackView.addArrangedSubview(accountSection)
+
+        // Footer
+        let footerView = createFooter()
+        sectionsStackView.addArrangedSubview(footerView)
     }
-    
-    private func setupPrivacyCard() {
-        privacyCard.translatesAutoresizingMaskIntoConstraints = false
-        createStandardCard(
-            card: privacyCard,
-            iconName: "shield",
-            iconColor: UIColor(red: 0.9, green: 0.6, blue: 0.7, alpha: 1.0),
-            title: "Privacy & Data",
-            subtitle: "How we protect your information"
-        )
-    }
-    
-    private func setupSupportCard() {
-        supportCard.translatesAutoresizingMaskIntoConstraints = false
-        createStandardCard(
-            card: supportCard,
-            iconName: "envelope",
-            iconColor: UIColor(red: 0.9, green: 0.6, blue: 0.7, alpha: 1.0),
-            title: "Support & Feedback",
-            subtitle: "Get help or share your thoughts"
-        )
-    }
-    
-    private func createStandardCard(card: UIView, iconName: String, iconColor: UIColor, title: String, subtitle: String) {
-        card.backgroundColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0) :
-                UIColor(red: 0.925, green: 0.91, blue: 0.895, alpha: 1.0)
-        }
-        card.layer.cornerRadius = 20
-        card.layer.shadowColor = UIColor.black.cgColor
-        card.layer.shadowOpacity = 0.08
-        card.layer.shadowRadius = 8
-        card.layer.shadowOffset = CGSize(width: 0, height: 3)
-        
-        // Icon background (soft beige circle)
-        let iconBackground = UIView()
-        iconBackground.translatesAutoresizingMaskIntoConstraints = false
-        iconBackground.backgroundColor = UIColor(red: 0.95, green: 0.92, blue: 0.88, alpha: 1.0)
-        iconBackground.layer.cornerRadius = 25
-        card.addSubview(iconBackground)
-        
-        // Icon
-        let icon = UIImageView()
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        icon.image = UIImage(systemName: iconName)
-        icon.tintColor = iconColor
-        iconBackground.addSubview(icon)
-        
-        // Title
+
+    private func createSection(title: String, items: [SettingsItem]) -> UIView {
+        let sectionView = UIView()
+        sectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Section Title
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = title
-        titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        titleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0) :
-                UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1.0)
+        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        titleLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        sectionView.addSubview(titleLabel)
+
+        // Items Container
+        let itemsContainer = UIView()
+        itemsContainer.translatesAutoresizingMaskIntoConstraints = false
+        itemsContainer.backgroundColor = UIColor.white
+        itemsContainer.layer.cornerRadius = 12
+        sectionView.addSubview(itemsContainer)
+
+        // Create items
+        var lastView: UIView = itemsContainer
+        for (index, item) in items.enumerated() {
+            let itemView = createSettingsItemView(item: item)
+            itemsContainer.addSubview(itemView)
+
+            NSLayoutConstraint.activate([
+                itemView.leadingAnchor.constraint(equalTo: itemsContainer.leadingAnchor),
+                itemView.trailingAnchor.constraint(equalTo: itemsContainer.trailingAnchor),
+                itemView.heightAnchor.constraint(equalToConstant: 60)
+            ])
+
+            if index == 0 {
+                itemView.topAnchor.constraint(equalTo: itemsContainer.topAnchor).isActive = true
+            } else {
+                itemView.topAnchor.constraint(equalTo: lastView.bottomAnchor).isActive = true
+            }
+
+            if index == items.count - 1 {
+                itemView.bottomAnchor.constraint(equalTo: itemsContainer.bottomAnchor).isActive = true
+            }
+
+            // Add separator
+            if index < items.count - 1 {
+                let separator = UIView()
+                separator.translatesAutoresizingMaskIntoConstraints = false
+                separator.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+                itemsContainer.addSubview(separator)
+
+                NSLayoutConstraint.activate([
+                    separator.leadingAnchor.constraint(equalTo: itemsContainer.leadingAnchor, constant: 56),
+                    separator.trailingAnchor.constraint(equalTo: itemsContainer.trailingAnchor),
+                    separator.bottomAnchor.constraint(equalTo: itemView.bottomAnchor),
+                    separator.heightAnchor.constraint(equalToConstant: 1)
+                ])
+            }
+
+            lastView = itemView
         }
-        titleLabel.numberOfLines = 0
-        titleLabel.lineBreakMode = .byWordWrapping
-        card.addSubview(titleLabel)
-        
-        // Subtitle
-        let subtitleLabel = UILabel()
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.text = subtitle
-        subtitleLabel.font = UIFont.systemFont(ofSize: 15, weight: .regular)
-        subtitleLabel.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0) :
-                UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
-        }
-        subtitleLabel.numberOfLines = 0
-        subtitleLabel.lineBreakMode = .byWordWrapping
-        card.addSubview(subtitleLabel)
-        
+
         NSLayoutConstraint.activate([
-            card.heightAnchor.constraint(greaterThanOrEqualToConstant: 90),  // Allow dynamic height for multi-line text
-            
-            iconBackground.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),  // Reduced padding
-            iconBackground.centerYAnchor.constraint(equalTo: card.centerYAnchor),
-            iconBackground.widthAnchor.constraint(equalToConstant: 50),
-            iconBackground.heightAnchor.constraint(equalToConstant: 50),
-            
-            icon.centerXAnchor.constraint(equalTo: iconBackground.centerXAnchor),
-            icon.centerYAnchor.constraint(equalTo: iconBackground.centerYAnchor),
-            icon.widthAnchor.constraint(equalToConstant: 24),
-            icon.heightAnchor.constraint(equalToConstant: 24),
-            
-            titleLabel.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),  // Reduced padding
-            titleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),  // Reduced spacing
-            titleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
-            
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            subtitleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),
-            subtitleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
-            subtitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: card.bottomAnchor, constant: -16)
+            titleLabel.topAnchor.constraint(equalTo: sectionView.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: sectionView.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: sectionView.trailingAnchor, constant: -16),
+
+            itemsContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            itemsContainer.leadingAnchor.constraint(equalTo: sectionView.leadingAnchor, constant: 16),
+            itemsContainer.trailingAnchor.constraint(equalTo: sectionView.trailingAnchor, constant: -16),
+            itemsContainer.bottomAnchor.constraint(equalTo: sectionView.bottomAnchor)
         ])
+
+        return sectionView
     }
-    
-    
-    private func createBulletPoint(text: String) -> UILabel {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "• \(text)"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        label.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0) :
-                UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
+
+    private func createSettingsItemView(item: SettingsItem) -> UIView {
+        let itemView = UIView()
+        itemView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Icon Background
+        let iconBackground = UIView()
+        iconBackground.translatesAutoresizingMaskIntoConstraints = false
+        iconBackground.backgroundColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        iconBackground.layer.cornerRadius = 8
+        itemView.addSubview(iconBackground)
+
+        // Icon
+        let iconImageView = UIImageView()
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+        iconImageView.image = UIImage(systemName: item.icon)
+        iconImageView.tintColor = UIColor.white
+        iconImageView.contentMode = .scaleAspectFit
+        iconBackground.addSubview(iconImageView)
+
+        // Title
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.text = item.title
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+        itemView.addSubview(titleLabel)
+
+        // Subtitle (optional)
+        var subtitleLabel: UILabel?
+        if let subtitle = item.subtitle {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.text = subtitle
+            label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+            label.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+            itemView.addSubview(label)
+            subtitleLabel = label
         }
-        label.numberOfLines = 0
-        return label
+
+        // Toggle or Arrow
+        if item.hasToggle {
+            let toggle = UISwitch()
+            toggle.translatesAutoresizingMaskIntoConstraints = false
+            toggle.onTintColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
+            toggle.isOn = item.isToggleOn
+            itemView.addSubview(toggle)
+
+            NSLayoutConstraint.activate([
+                toggle.centerYAnchor.constraint(equalTo: itemView.centerYAnchor),
+                toggle.trailingAnchor.constraint(equalTo: itemView.trailingAnchor, constant: -16)
+            ])
+        } else {
+            let arrowImageView = UIImageView()
+            arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+            arrowImageView.image = UIImage(systemName: "chevron.right")
+            arrowImageView.tintColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+            itemView.addSubview(arrowImageView)
+
+            NSLayoutConstraint.activate([
+                arrowImageView.centerYAnchor.constraint(equalTo: itemView.centerYAnchor),
+                arrowImageView.trailingAnchor.constraint(equalTo: itemView.trailingAnchor, constant: -16),
+                arrowImageView.widthAnchor.constraint(equalToConstant: 12),
+                arrowImageView.heightAnchor.constraint(equalToConstant: 12)
+            ])
+        }
+
+        // Constraints
+        NSLayoutConstraint.activate([
+            iconBackground.leadingAnchor.constraint(equalTo: itemView.leadingAnchor, constant: 16),
+            iconBackground.centerYAnchor.constraint(equalTo: itemView.centerYAnchor),
+            iconBackground.widthAnchor.constraint(equalToConstant: 32),
+            iconBackground.heightAnchor.constraint(equalToConstant: 32),
+
+            iconImageView.centerXAnchor.constraint(equalTo: iconBackground.centerXAnchor),
+            iconImageView.centerYAnchor.constraint(equalTo: iconBackground.centerYAnchor),
+            iconImageView.widthAnchor.constraint(equalToConstant: 18),
+            iconImageView.heightAnchor.constraint(equalToConstant: 18),
+
+            titleLabel.leadingAnchor.constraint(equalTo: iconBackground.trailingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: itemView.trailingAnchor, constant: -60)
+        ])
+
+        if let subtitleLabel = subtitleLabel {
+            NSLayoutConstraint.activate([
+                titleLabel.topAnchor.constraint(equalTo: itemView.topAnchor, constant: 12),
+                subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+                subtitleLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+                subtitleLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor)
+            ])
+        } else {
+            titleLabel.centerYAnchor.constraint(equalTo: itemView.centerYAnchor).isActive = true
+        }
+
+        return itemView
     }
-    
-    // MARK: - Constraints
+
+    private func createFooter() -> UIView {
+        let footerView = UIView()
+        footerView.translatesAutoresizingMaskIntoConstraints = false
+
+        let appVersionLabel = UILabel()
+        appVersionLabel.translatesAutoresizingMaskIntoConstraints = false
+        appVersionLabel.text = "Spiritual Companion v2.1.0"
+        appVersionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        appVersionLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        appVersionLabel.textAlignment = .center
+        footerView.addSubview(appVersionLabel)
+
+        let linksStackView = UIStackView()
+        linksStackView.translatesAutoresizingMaskIntoConstraints = false
+        linksStackView.axis = .horizontal
+        linksStackView.spacing = 16
+        linksStackView.alignment = .center
+        footerView.addSubview(linksStackView)
+
+        let termsLabel = UILabel()
+        termsLabel.text = "Terms of Service"
+        termsLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        termsLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        linksStackView.addArrangedSubview(termsLabel)
+
+        let privacyLabel = UILabel()
+        privacyLabel.text = "Privacy Policy"
+        privacyLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        privacyLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        linksStackView.addArrangedSubview(privacyLabel)
+
+        NSLayoutConstraint.activate([
+            appVersionLabel.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 32),
+            appVersionLabel.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
+
+            linksStackView.topAnchor.constraint(equalTo: appVersionLabel.bottomAnchor, constant: 8),
+            linksStackView.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
+            linksStackView.bottomAnchor.constraint(equalTo: footerView.bottomAnchor, constant: -32)
+        ])
+
+        return footerView
+    }
+
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // Scroll View
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
             // Content View
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            
-            // Header (no back button)
+
+            // Header
             headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: 100),
-            
+            headerView.heightAnchor.constraint(equalToConstant: 60),
+
+            backButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
+            backButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            backButton.widthAnchor.constraint(equalToConstant: 24),
+            backButton.heightAnchor.constraint(equalToConstant: 24),
+
             titleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            
-            // Cards Stack View
-            cardsStackView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 20),
-            cardsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            cardsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            cardsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40)
+
+            // Profile View
+            profileView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 16),
+            profileView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            profileView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            profileView.heightAnchor.constraint(equalToConstant: 80),
+
+            profileImageView.leadingAnchor.constraint(equalTo: profileView.leadingAnchor, constant: 16),
+            profileImageView.centerYAnchor.constraint(equalTo: profileView.centerYAnchor),
+            profileImageView.widthAnchor.constraint(equalToConstant: 48),
+            profileImageView.heightAnchor.constraint(equalToConstant: 48),
+
+            nameLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: 12),
+            nameLabel.topAnchor.constraint(equalTo: profileView.topAnchor, constant: 20),
+            nameLabel.trailingAnchor.constraint(equalTo: profileArrowImageView.leadingAnchor, constant: -12),
+
+            memberLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            memberLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2),
+            memberLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+
+            profileArrowImageView.trailingAnchor.constraint(equalTo: profileView.trailingAnchor, constant: -16),
+            profileArrowImageView.centerYAnchor.constraint(equalTo: profileView.centerYAnchor),
+            profileArrowImageView.widthAnchor.constraint(equalToConstant: 12),
+            profileArrowImageView.heightAnchor.constraint(equalToConstant: 12),
+
+            // Sections
+            sectionsStackView.topAnchor.constraint(equalTo: profileView.bottomAnchor, constant: 32),
+            sectionsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            sectionsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            sectionsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
-    
-    // MARK: - Actions
+
     private func setupActions() {
-        // Add tap gestures to cards (removed back button action)
-        let aboutTap = UITapGestureRecognizer(target: self, action: #selector(aboutIrisTapped))
-        aboutIrisCard.addGestureRecognizer(aboutTap)
-        aboutIrisCard.isUserInteractionEnabled = true
-        
-        let termsTap = UITapGestureRecognizer(target: self, action: #selector(termsTapped))
-        termsCard.addGestureRecognizer(termsTap)
-        termsCard.isUserInteractionEnabled = true
-        
-        let upgradeTap = UITapGestureRecognizer(target: self, action: #selector(upgradeTapped))
-        upgradeCard.addGestureRecognizer(upgradeTap)
-        upgradeCard.isUserInteractionEnabled = true
-        
-        let privacyTap = UITapGestureRecognizer(target: self, action: #selector(privacyTapped))
-        privacyCard.addGestureRecognizer(privacyTap)
-        privacyCard.isUserInteractionEnabled = true
-        
-        let supportTap = UITapGestureRecognizer(target: self, action: #selector(supportTapped))
-        supportCard.addGestureRecognizer(supportTap)
-        supportCard.isUserInteractionEnabled = true
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
     }
-    
-    
-    @objc private func joinAmbassadorProgram() {
-        // Add haptic feedback
-        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-        impactFeedback.impactOccurred()
-        
-        // Find the join button in the ambassador card
-        if let joinButton = ambassadorCard.subviews.compactMap({ $0 as? UIButton }).first {
-            UIView.animate(withDuration: 0.1, animations: {
-                joinButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-                joinButton.alpha = 0.8
-            }) { _ in
-                UIView.animate(withDuration: 0.1) {
-                    joinButton.transform = .identity
-                    joinButton.alpha = 1.0
-                }
-            }
-        }
-        
-        // Handle join ambassador program action
-        let alert = UIAlertController(
-            title: "Welcome to the Ambassador Program!",
-            message: "Thank you for your interest in sharing Iris with your community. We'll be in touch with more details soon.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Great!", style: .default))
-        present(alert, animated: true)
+
+    // MARK: - Actions
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
-    
-    @objc private func aboutIrisTapped() {
-        animateCardTap(card: aboutIrisCard)
-        // Handle About Iris navigation
-        print("About Iris tapped")
-    }
-    
-    @objc private func termsTapped() {
-        animateCardTap(card: termsCard)
-        // Handle Terms navigation
-        print("Terms tapped")
-    }
-    
-    @objc private func upgradeTapped() {
-        animateCardTap(card: upgradeCard)
-        // Handle Upgrade navigation
-        print("Upgrade tapped")
-    }
-    
-    @objc private func privacyTapped() {
-        animateCardTap(card: privacyCard)
-        // Handle Privacy navigation
-        print("Privacy tapped")
-    }
-    
-    @objc private func supportTapped() {
-        animateCardTap(card: supportCard)
-        // Handle Support navigation
-        print("Support tapped")
-    }
-    
-    private func animateCardTap(card: UIView) {
-        // Add haptic feedback
-        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-        impactFeedback.impactOccurred()
-        
-        // Animate card tap
-        UIView.animate(withDuration: 0.1, animations: {
-            card.transform = CGAffineTransform(scaleX: 0.98, y: 0.98)
-        }) { _ in
-            UIView.animate(withDuration: 0.1) {
-                card.transform = .identity
-            }
-        }
-    }
-    
-    // MARK: - Dark Mode Support
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-            // Update any custom layers or colors that don't automatically adapt
-            updateAppearance()
-        }
-    }
-    
-    private func updateAppearance() {
-        // Update shadow colors for dark mode
-        let shadowColor = UIColor.black.cgColor
-        
-        welcomeCard.layer.shadowColor = shadowColor
-        aboutIrisCard.layer.shadowColor = shadowColor
-        termsCard.layer.shadowColor = shadowColor
-        upgradeCard.layer.shadowColor = shadowColor
-        ambassadorCard.layer.shadowColor = shadowColor
-        privacyCard.layer.shadowColor = shadowColor
-        supportCard.layer.shadowColor = shadowColor
+}
+
+// MARK: - Settings Item Model
+struct SettingsItem {
+    let icon: String
+    let title: String
+    let subtitle: String?
+    let hasToggle: Bool
+    let isToggleOn: Bool
+
+    init(icon: String, title: String, subtitle: String? = nil, hasToggle: Bool = false, isToggleOn: Bool = false) {
+        self.icon = icon
+        self.title = title
+        self.subtitle = subtitle
+        self.hasToggle = hasToggle
+        self.isToggleOn = isToggleOn
     }
 }

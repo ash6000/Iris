@@ -397,10 +397,15 @@ class WelcomeViewController: UIViewController {
     
     @objc private func startJourneyButtonTapped() {
         if isPersonalized {
-            // Navigate to personalized chat screen
-            let chatVC = PersonalizedChatViewController()
-            chatVC.modalPresentationStyle = .fullScreen
-            present(chatVC, animated: true)
+            // Navigate to main app with chat tab selected
+            let tabBarController = CustomTabBarController()
+            tabBarController.modalPresentationStyle = .fullScreen
+            present(tabBarController, animated: true)
+
+            // Select chat tab after presentation
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                tabBarController.selectTab(at: 2)
+            }
         } else {
             print("Starting personality detection journey...")
             // Navigate directly to personality questions screen

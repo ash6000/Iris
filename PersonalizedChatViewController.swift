@@ -11,7 +11,6 @@ class PersonalizedChatViewController: UIViewController {
 
     // MARK: - UI Components
     private let headerView = UIView()
-    private let backButton = UIButton()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
     private let moreButton = UIButton()
@@ -39,6 +38,7 @@ class PersonalizedChatViewController: UIViewController {
     private let sendButton = UIButton()
     private let placeholderLabel = UILabel()
 
+
     // Data
     private var personalityType: String?
     private var messages: [ChatMessage] = []
@@ -51,6 +51,15 @@ class PersonalizedChatViewController: UIViewController {
         setupActions()
         loadPersonalizedContent()
         setupKeyboardObservers()
+
+        // Hide elements initially for animation
+        prepareForAnimations()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Start the entrance animations
+        startEntranceAnimations()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -64,14 +73,8 @@ class PersonalizedChatViewController: UIViewController {
 
         // Header View
         headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.backgroundColor = UIColor.white
+        headerView.backgroundColor = UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
         view.addSubview(headerView)
-
-        // Back Button
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-        backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        backButton.tintColor = UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0)
-        headerView.addSubview(backButton)
 
         // Title Label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -155,7 +158,7 @@ class PersonalizedChatViewController: UIViewController {
         quickStartersStackView.spacing = 12
         contentView.addSubview(quickStartersStackView)
 
-        setupMessages()
+        setupInitialMessagesData()
         setupQuickStarters()
         setupInputContainer()
     }
@@ -206,20 +209,249 @@ class PersonalizedChatViewController: UIViewController {
         updatePlaceholderVisibility()
     }
 
-    private func setupMessages() {
-        // First message with personalized greeting
+    private func setupInitialMessagesData() {
+        // Store initial messages data but don't add to UI yet
+        // Will be animated in later
+    }
+
+    private func prepareForAnimations() {
+        // Hide elements that will animate in
+        avatarView.alpha = 0
+        avatarView.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+
+        greetingLabel.alpha = 0
+        greetingLabel.transform = CGAffineTransform(translationX: 0, y: 30)
+
+        descriptionLabel.alpha = 0
+        descriptionLabel.transform = CGAffineTransform(translationX: 0, y: 30)
+
+        quickStartersLabel.alpha = 0
+        quickStartersStackView.alpha = 0
+
+        inputContainerView.alpha = 0
+        inputContainerView.transform = CGAffineTransform(translationX: 0, y: 50)
+    }
+
+    private func startEntranceAnimations() {
+        // Animate header elements first
+        animateHeaderElements()
+
+        // Then animate messages with delays
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            self.animateFirstMessage()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+            self.animateSecondMessage()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            self.animateQuickStarters()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.5) {
+            self.animateInputContainer()
+        }
+    }
+
+    private func animateHeaderElements() {
+        // Avatar animation with spring effect
+        UIView.animate(withDuration: 0.8, delay: 0.2, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.8, options: .curveEaseOut, animations: {
+            self.avatarView.alpha = 1
+            self.avatarView.transform = CGAffineTransform.identity
+        }) { _ in
+            // Start breathing animation after avatar appears
+            self.startBreathingAnimation()
+        }
+
+        // Greeting label animation
+        UIView.animate(withDuration: 0.6, delay: 0.5, options: .curveEaseOut) {
+            self.greetingLabel.alpha = 1
+            self.greetingLabel.transform = CGAffineTransform.identity
+        }
+
+        // Description label animation
+        UIView.animate(withDuration: 0.6, delay: 0.7, options: .curveEaseOut) {
+            self.descriptionLabel.alpha = 1
+            self.descriptionLabel.transform = CGAffineTransform.identity
+        }
+    }
+
+    private func animateFirstMessage() {
         let firstMessage = createMessageBubble(
             text: "Hello! I've learned about your personality from our initial setup. I'm excited to be your thinking partner.",
             isFromIris: true
         )
+
+        // Start with hidden and scaled down
+        firstMessage.alpha = 0
+        firstMessage.transform = CGAffineTransform(scaleX: 0.8, y: 0.8).translatedBy(x: -20, y: 0)
+
         messagesStackView.addArrangedSubview(firstMessage)
 
-        // Second message with conversation starter
+        // Animate typing effect
+        animateTypingIndicator {
+            UIView.animate(withDuration: 0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: .curveEaseOut) {
+                firstMessage.alpha = 1
+                firstMessage.transform = CGAffineTransform.identity
+            }
+        }
+    }
+
+    private func animateSecondMessage() {
         let secondMessage = createMessageBubble(
             text: "What's on your mind today? I'm here to help you think through anything - whether it's planning your next big goal, solving a challenge, or just exploring ideas.",
             isFromIris: true
         )
+
+        // Start with hidden and scaled down
+        secondMessage.alpha = 0
+        secondMessage.transform = CGAffineTransform(scaleX: 0.8, y: 0.8).translatedBy(x: -20, y: 0)
+
         messagesStackView.addArrangedSubview(secondMessage)
+
+        // Animate typing effect
+        animateTypingIndicator {
+            UIView.animate(withDuration: 0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: .curveEaseOut) {
+                secondMessage.alpha = 1
+                secondMessage.transform = CGAffineTransform.identity
+            }
+        }
+    }
+
+    private func animateQuickStarters() {
+        UIView.animate(withDuration: 0.6, delay: 0, options: .curveEaseOut) {
+            self.quickStartersLabel.alpha = 1
+        }
+
+        UIView.animate(withDuration: 0.8, delay: 0.2, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.3, options: .curveEaseOut) {
+            self.quickStartersStackView.alpha = 1
+        }
+    }
+
+    private func animateInputContainer() {
+        UIView.animate(withDuration: 0.8, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: .curveEaseOut) {
+            self.inputContainerView.alpha = 1
+            self.inputContainerView.transform = CGAffineTransform.identity
+        }
+    }
+
+    private func animateTypingIndicator(completion: @escaping () -> Void) {
+        // Create temporary typing indicator
+        let typingIndicator = createTypingIndicator()
+        typingIndicator.alpha = 0
+        messagesStackView.addArrangedSubview(typingIndicator)
+
+        // Fade in typing indicator
+        UIView.animate(withDuration: 0.3) {
+            typingIndicator.alpha = 1
+        }
+
+        // Show typing for 1.5 seconds then remove and show message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            UIView.animate(withDuration: 0.2, animations: {
+                typingIndicator.alpha = 0
+            }) { _ in
+                typingIndicator.removeFromSuperview()
+                completion()
+            }
+        }
+    }
+
+    private func createTypingIndicator() -> UIView {
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+
+        let bubbleView = UIView()
+        bubbleView.translatesAutoresizingMaskIntoConstraints = false
+        bubbleView.backgroundColor = UIColor.white
+        bubbleView.layer.cornerRadius = 16
+        bubbleView.layer.shadowColor = UIColor.black.cgColor
+        bubbleView.layer.shadowOpacity = 0.05
+        bubbleView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        bubbleView.layer.shadowRadius = 8
+        containerView.addSubview(bubbleView)
+
+        // Add avatar for Iris
+        let avatarView = UIView()
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        avatarView.backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0)
+        avatarView.layer.cornerRadius = 16
+        containerView.addSubview(avatarView)
+
+        let avatarLabel = UILabel()
+        avatarLabel.translatesAutoresizingMaskIntoConstraints = false
+        avatarLabel.text = "I"
+        avatarLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        avatarLabel.textColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        avatarLabel.textAlignment = .center
+        avatarView.addSubview(avatarLabel)
+
+        // Add typing dots
+        let dotsStackView = UIStackView()
+        dotsStackView.translatesAutoresizingMaskIntoConstraints = false
+        dotsStackView.axis = .horizontal
+        dotsStackView.spacing = 4
+        dotsStackView.alignment = .center
+        bubbleView.addSubview(dotsStackView)
+
+        for i in 0..<3 {
+            let dot = UIView()
+            dot.translatesAutoresizingMaskIntoConstraints = false
+            dot.backgroundColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+            dot.layer.cornerRadius = 3
+
+            NSLayoutConstraint.activate([
+                dot.widthAnchor.constraint(equalToConstant: 6),
+                dot.heightAnchor.constraint(equalToConstant: 6)
+            ])
+
+            dotsStackView.addArrangedSubview(dot)
+
+            // Animate dots
+            let animation = CABasicAnimation(keyPath: "opacity")
+            animation.fromValue = 0.3
+            animation.toValue = 1.0
+            animation.duration = 0.6
+            animation.repeatCount = .infinity
+            animation.autoreverses = true
+            animation.beginTime = CACurrentMediaTime() + Double(i) * 0.2
+            dot.layer.add(animation, forKey: "opacity")
+        }
+
+        NSLayoutConstraint.activate([
+            avatarView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            avatarView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            avatarView.widthAnchor.constraint(equalToConstant: 32),
+            avatarView.heightAnchor.constraint(equalToConstant: 32),
+
+            avatarLabel.centerXAnchor.constraint(equalTo: avatarView.centerXAnchor),
+            avatarLabel.centerYAnchor.constraint(equalTo: avatarView.centerYAnchor),
+
+            bubbleView.leadingAnchor.constraint(equalTo: avatarView.trailingAnchor, constant: 12),
+            bubbleView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            bubbleView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            bubbleView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+
+            dotsStackView.centerXAnchor.constraint(equalTo: bubbleView.centerXAnchor),
+            dotsStackView.centerYAnchor.constraint(equalTo: bubbleView.centerYAnchor),
+            dotsStackView.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 16),
+            dotsStackView.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: -16)
+        ])
+
+        return containerView
+    }
+
+    private func startBreathingAnimation() {
+        let breathingAnimation = CABasicAnimation(keyPath: "transform.scale")
+        breathingAnimation.fromValue = 1.0
+        breathingAnimation.toValue = 1.08
+        breathingAnimation.duration = 2.0
+        breathingAnimation.repeatCount = .infinity
+        breathingAnimation.autoreverses = true
+        breathingAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+
+        avatarView.layer.add(breathingAnimation, forKey: "breathing")
     }
 
     private func setupQuickStarters() {
@@ -241,7 +473,11 @@ class PersonalizedChatViewController: UIViewController {
 
         let bubbleView = UIView()
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
-        bubbleView.backgroundColor = UIColor.white
+        if isFromIris {
+            bubbleView.backgroundColor = UIColor.white
+        } else {
+            bubbleView.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0) // User message color
+        }
         bubbleView.layer.cornerRadius = 16
         bubbleView.layer.shadowColor = UIColor.black.cgColor
         bubbleView.layer.shadowOpacity = 0.05
@@ -280,8 +516,9 @@ class PersonalizedChatViewController: UIViewController {
                 bubbleView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             ])
         } else {
+            // User messages - right aligned with left margin
             NSLayoutConstraint.activate([
-                bubbleView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 44),
+                bubbleView.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.leadingAnchor, constant: 44),
                 bubbleView.topAnchor.constraint(equalTo: containerView.topAnchor),
                 bubbleView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
                 bubbleView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
@@ -292,7 +529,11 @@ class PersonalizedChatViewController: UIViewController {
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         messageLabel.text = text
         messageLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        messageLabel.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+        if isFromIris {
+            messageLabel.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+        } else {
+            messageLabel.textColor = UIColor.white // White text for user messages
+        }
         messageLabel.numberOfLines = 0
         bubbleView.addSubview(messageLabel)
 
@@ -359,11 +600,6 @@ class PersonalizedChatViewController: UIViewController {
             headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 80),
 
-            // Back Button
-            backButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
-            backButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            backButton.widthAnchor.constraint(equalToConstant: 24),
-            backButton.heightAnchor.constraint(equalToConstant: 24),
 
             // Title Label
             titleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
@@ -432,7 +668,7 @@ class PersonalizedChatViewController: UIViewController {
             // Input Container
             inputContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             inputContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            inputContainerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            inputContainerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             inputContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 80),
 
             // Input Background
@@ -457,12 +693,12 @@ class PersonalizedChatViewController: UIViewController {
             sendButton.trailingAnchor.constraint(equalTo: inputBackgroundView.trailingAnchor, constant: -8),
             sendButton.centerYAnchor.constraint(equalTo: inputBackgroundView.centerYAnchor),
             sendButton.widthAnchor.constraint(equalToConstant: 40),
-            sendButton.heightAnchor.constraint(equalToConstant: 40)
+            sendButton.heightAnchor.constraint(equalToConstant: 40),
+
         ])
     }
 
     private func setupActions() {
-        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
     }
 
@@ -521,9 +757,6 @@ class PersonalizedChatViewController: UIViewController {
     }
 
     // MARK: - Actions
-    @objc private func backButtonTapped() {
-        dismiss(animated: true)
-    }
 
     @objc private func moreButtonTapped() {
         // Handle more button tap
@@ -541,10 +774,34 @@ class PersonalizedChatViewController: UIViewController {
         textInputView.becomeFirstResponder()
     }
 
+
+    private func createPlaceholderVC(title: String, color: UIColor) -> UIViewController {
+        let vc = UIViewController()
+        vc.view.backgroundColor = UIColor(red: 0.94, green: 0.92, blue: 0.88, alpha: 1.0)
+
+        let label = UILabel()
+        label.text = title
+        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.textColor = color
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        vc.view.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: vc.view.centerYAnchor)
+        ])
+
+        return vc
+    }
+
     @objc private func sendButtonTapped() {
         guard let messageText = textInputView.text, !messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return
         }
+
+        // Hide quick starters after first user message
+        hideQuickStarters()
 
         // Add user message
         addMessage(text: messageText, isFromIris: false)
@@ -564,6 +821,12 @@ class PersonalizedChatViewController: UIViewController {
         messagesStackView.addArrangedSubview(messageBubble)
 
         // Scroll to bottom
+        DispatchQueue.main.async {
+            self.scrollToBottom()
+        }
+    }
+
+    private func scrollToBottom() {
         DispatchQueue.main.async {
             let bottomOffset = CGPoint(x: 0, y: max(0, self.scrollView.contentSize.height - self.scrollView.bounds.height))
             self.scrollView.setContentOffset(bottomOffset, animated: true)
@@ -588,6 +851,19 @@ class PersonalizedChatViewController: UIViewController {
         placeholderLabel.isHidden = !textInputView.text.isEmpty
     }
 
+    private func hideQuickStarters() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            self.quickStartersLabel.alpha = 0
+            self.quickStartersStackView.alpha = 0
+            self.quickStartersLabel.transform = CGAffineTransform(translationX: 0, y: -20)
+            self.quickStartersStackView.transform = CGAffineTransform(translationX: 0, y: -20)
+        }) { _ in
+            // After animation completes, hide the views to free up space
+            self.quickStartersLabel.isHidden = true
+            self.quickStartersStackView.isHidden = true
+        }
+    }
+
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
               let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else {
@@ -596,9 +872,22 @@ class PersonalizedChatViewController: UIViewController {
 
         let keyboardHeight = keyboardFrame.height
 
+        // Calculate how much we need to move up to keep input visible
+        let inputContainerFrame = inputContainerView.frame
+        let inputContainerBottom = inputContainerFrame.maxY
+        let screenHeight = view.frame.height
+        let keyboardTop = screenHeight - keyboardHeight
+
+        // Calculate movement to keep input container visible above keyboard
+        let inputContainerHeight: CGFloat = 80 // Input container height
+        let targetPadding: CGFloat = 10 // Small padding above input
+        let moveUpDistance = keyboardHeight - view.safeAreaInsets.bottom + inputContainerHeight + targetPadding
+
         UIView.animate(withDuration: duration) {
-            // Update input container bottom constraint to keyboard height
-            self.view.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight + self.view.safeAreaInsets.bottom)
+            self.view.transform = CGAffineTransform(translationX: 0, y: -moveUpDistance)
+        } completion: { _ in
+            // Scroll to bottom to show latest messages
+            self.scrollToBottom()
         }
     }
 
@@ -633,4 +922,5 @@ extension PersonalizedChatViewController: UITextViewDelegate {
         textView.isScrollEnabled = newHeight >= maxHeight
     }
 }
+
 

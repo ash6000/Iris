@@ -72,8 +72,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // MARK: - Helper Methods
     private func determineInitialViewController() -> UIViewController {
-        // For now, always show welcome screen for testing
-        return IrisWelcomeViewController()
+        // TODO: Check for existing user authentication here
+        // For now, always show login screen
+        // In the future: if user is logged in, go directly to CustomTabBarController()
+
+        let initialViewController = LoginViewController()
+        let navController = UINavigationController(rootViewController: initialViewController)
+        navController.isNavigationBarHidden = true
+        return navController
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

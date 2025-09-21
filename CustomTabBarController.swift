@@ -7,7 +7,7 @@ class CustomTabBarController: UIViewController {
     // Tab Bar UI
     private let tabBarView = UIView()
     private let tabStackView = UIStackView()
-    private var tabButtons: [TabButton] = []
+    private var tabButtons: [UIButton] = []
     
     // Content container
     private let contentContainerView = UIView()
@@ -33,41 +33,36 @@ class CustomTabBarController: UIViewController {
         setupUI()
         setupConstraints()
         
-        // Initialize the first tab immediately after setup
+        // Initialize the chat tab immediately after setup
         DispatchQueue.main.async {
-            self.selectTab(at: 0)
+            self.selectTab(at: 2)
         }
     }
     
     private func setupViewControllers() {
-        // Home tab - Now uses ChatViewController
-        let homeVC = ChatViewController()
-        //let homeVC = IrisWelcomeViewController()
-        homeVC.customTabBarController = self
+        // Home tab - Today's Mode (using MoodTrackingViewController for now)
+        let homeVC = MoodTrackingViewController()
         homeNavigationController = UINavigationController(rootViewController: homeVC)
         homeNavigationController.isNavigationBarHidden = true
-       // homeNavigationController.isToolbarHidden = true
 
-        // Mood tab
-        let moodVC = MoodTrackingViewController()
-        moodNavigationController = UINavigationController(rootViewController: moodVC)
+        // Library tab - Music/Relax functionality
+        let libraryVC = RelaxViewController()
+        moodNavigationController = UINavigationController(rootViewController: libraryVC)
         moodNavigationController.isNavigationBarHidden = true
-        
-        // Relax tab
-        let relaxVC = RelaxViewController()
-        relaxNavigationController = UINavigationController(rootViewController: relaxVC)
+
+        // Chat tab - PersonalizedChatViewController
+        let chatVC = PersonalizedChatViewController()
+        relaxNavigationController = UINavigationController(rootViewController: chatVC)
         relaxNavigationController.isNavigationBarHidden = true
 
-        // Reflect tab - Placeholder for now
-        reflectNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "Reflect Coming Soon", color: .systemPink))
+        // Journal tab - Placeholder for now
+        reflectNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "Journal Coming Soon", color: .systemBrown))
         reflectNavigationController.isNavigationBarHidden = true
-        
-        // More tab
-        let moreVc = SettingsViewController()
-        moreNavigationController = UINavigationController(rootViewController: moreVc)
+
+        // Profile tab - Settings
+        let profileVC = SettingsViewController()
+        moreNavigationController = UINavigationController(rootViewController: profileVC)
         moreNavigationController.isNavigationBarHidden = true
-        //moreNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "More Options", color: .systemOrange))
-       // moreNavigationController.isNavigationBarHidden = true
     }
     
     private func createPlaceholderVC(title: String, color: UIColor) -> UIViewController {
@@ -106,29 +101,108 @@ class CustomTabBarController: UIViewController {
         tabBarView.backgroundColor = UIColor(red: 0.96, green: 0.94, blue: 0.90, alpha: 0.95)
         tabBarView.layer.cornerRadius = 20
         tabBarView.layer.cornerCurve = .continuous
+        tabBarView.isUserInteractionEnabled = true
         view.addSubview(tabBarView)
         
         tabStackView.translatesAutoresizingMaskIntoConstraints = false
         tabStackView.axis = .horizontal
         tabStackView.distribution = .fillEqually
         tabStackView.alignment = .center
+        tabStackView.isUserInteractionEnabled = true
         tabBarView.addSubview(tabStackView)
         
-        // Updated tab items - Added Reflect tab back
+        // Updated tab items to match image design more closely
         let tabItems = [
-            ("heart.fill", "Home"),        // ChatViewController with categories
-            ("calendar", "Mood"),
-            ("headphones", "Relax"),
-            ("book.fill", "Reflect"),      // Placeholder for now
-            ("ellipsis", "More")
+            ("house", "Home"),
+            ("text.book.closed", "Library"),
+            ("message", "Chat"),   // Center circular button
+            ("book", "Journal"),
+            ("person", "Profile")
         ]
         
         for (index, (icon, title)) in tabItems.enumerated() {
-            let tabButton = TabButton(icon: icon, title: title, isSelected: index == 0)
+            let isCenterButton = index == 2 // Chat button is at index 2
+
+            // Use standard UIButton for reliable touch handling
+            let tabButton = UIButton(type: .custom)
             tabButton.tag = index
+            tabButton.isUserInteractionEnabled = true
             tabButton.addTarget(self, action: #selector(tabButtonTapped(_:)), for: .touchUpInside)
+
+            // Clean styling - no debug colors
+            tabButton.backgroundColor = UIColor.clear
+
+            if isCenterButton {
+                // Center circular button
+                let circularBackground = UIView()
+                circularBackground.translatesAutoresizingMaskIntoConstraints = false
+                circularBackground.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
+                circularBackground.layer.cornerRadius = 30
+                circularBackground.isUserInteractionEnabled = false
+                tabButton.addSubview(circularBackground)
+
+                let iconImageView = UIImageView()
+                iconImageView.translatesAutoresizingMaskIntoConstraints = false
+                iconImageView.image = UIImage(systemName: icon)
+                iconImageView.contentMode = .scaleAspectFit
+                iconImageView.tintColor = UIColor.white
+                iconImageView.isUserInteractionEnabled = false
+                circularBackground.addSubview(iconImageView)
+
+                NSLayoutConstraint.activate([
+                    circularBackground.centerXAnchor.constraint(equalTo: tabButton.centerXAnchor),
+                    circularBackground.centerYAnchor.constraint(equalTo: tabButton.centerYAnchor),
+                    circularBackground.widthAnchor.constraint(equalToConstant: 60),
+                    circularBackground.heightAnchor.constraint(equalToConstant: 60),
+
+                    iconImageView.centerXAnchor.constraint(equalTo: circularBackground.centerXAnchor),
+                    iconImageView.centerYAnchor.constraint(equalTo: circularBackground.centerYAnchor),
+                    iconImageView.widthAnchor.constraint(equalToConstant: 24),
+                    iconImageView.heightAnchor.constraint(equalToConstant: 24)
+                ])
+            } else {
+                // Regular tab button
+                let stackView = UIStackView()
+                stackView.translatesAutoresizingMaskIntoConstraints = false
+                stackView.axis = .vertical
+                stackView.alignment = .center
+                stackView.spacing = 4
+                stackView.isUserInteractionEnabled = false
+                tabButton.addSubview(stackView)
+
+                let iconImageView = UIImageView()
+                iconImageView.translatesAutoresizingMaskIntoConstraints = false
+                iconImageView.image = UIImage(systemName: icon)
+                iconImageView.contentMode = .scaleAspectFit
+                iconImageView.tintColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+                stackView.addArrangedSubview(iconImageView)
+
+                let titleLabel = UILabel()
+                titleLabel.translatesAutoresizingMaskIntoConstraints = false
+                titleLabel.text = title
+                titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+                titleLabel.textAlignment = .center
+                titleLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+                stackView.addArrangedSubview(titleLabel)
+
+                NSLayoutConstraint.activate([
+                    stackView.centerXAnchor.constraint(equalTo: tabButton.centerXAnchor),
+                    stackView.centerYAnchor.constraint(equalTo: tabButton.centerYAnchor),
+                    iconImageView.widthAnchor.constraint(equalToConstant: 20),
+                    iconImageView.heightAnchor.constraint(equalToConstant: 20)
+                ])
+            }
+
+            // Ensure proper touch area size
+            tabButton.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                tabButton.heightAnchor.constraint(equalToConstant: 54),
+                tabButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 50)
+            ])
+
             tabStackView.addArrangedSubview(tabButton)
             tabButtons.append(tabButton)
+            print("🔧 Added tab button \(index): \(title)")
         }
     }
     
@@ -154,8 +228,8 @@ class CustomTabBarController: UIViewController {
         ])
     }
     
-    @objc private func tabButtonTapped(_ sender: TabButton) {
-        print("Tab button tapped: \(sender.tag)")
+    @objc private func tabButtonTapped(_ sender: UIButton) {
+        print("🔥 Tab button tapped: \(sender.tag)")
         selectTab(at: sender.tag)
     }
     
@@ -166,7 +240,7 @@ class CustomTabBarController: UIViewController {
         // Handle Home tab re-selection to go back to category list
         if index == selectedTabIndex && index == 0 && currentViewController != nil {
             // Pop to root view controller in home navigation
-            homeNavigationController.popToRootViewController(animated: true)
+            homeNavigationController?.popToRootViewController(animated: true)
             return
         }
         
@@ -179,21 +253,46 @@ class CustomTabBarController: UIViewController {
         
         // Update tab button states
         for (i, button) in tabButtons.enumerated() {
-            button.setSelected(i == index)
+            updateTabButtonAppearance(button: button, index: i, isSelected: i == index)
         }
         
-        // Switch view controller - Updated mapping for 5 tabs
-        let viewControllerToShow: UIViewController
+        // Switch view controller - Updated mapping for new tab layout
+        let viewControllerToShow: UIViewController?
         switch index {
-        case 0: viewControllerToShow = homeNavigationController      // ChatViewController
-        case 1: viewControllerToShow = moodNavigationController
-        case 2: viewControllerToShow = relaxNavigationController
-        case 3: viewControllerToShow = reflectNavigationController  // Placeholder
-        case 4: viewControllerToShow = moreNavigationController
+        case 0: viewControllerToShow = homeNavigationController      // Home - Today's Mode
+        case 1: viewControllerToShow = moodNavigationController      // Library - Music/Relax
+        case 2: viewControllerToShow = relaxNavigationController     // Chat - PersonalizedChatViewController
+        case 3: viewControllerToShow = reflectNavigationController   // Journal
+        case 4: viewControllerToShow = moreNavigationController      // Profile - Settings
         default: return
         }
-        
-        switchToViewController(viewControllerToShow)
+
+        guard let controllerToShow = viewControllerToShow else {
+            print("Warning: Navigation controller is nil for tab index \(index)")
+            return
+        }
+
+        switchToViewController(controllerToShow)
+    }
+
+    private func updateTabButtonAppearance(button: UIButton, index: Int, isSelected: Bool) {
+        let selectedColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
+        let unselectedColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+
+        if index == 2 { // Center button
+            // Center button appearance doesn't change - it's always the pink circular button
+            return
+        } else {
+            // Update regular tab button colors
+            if let stackView = button.subviews.first as? UIStackView {
+                if let iconImageView = stackView.arrangedSubviews.first as? UIImageView {
+                    iconImageView.tintColor = isSelected ? selectedColor : unselectedColor
+                }
+                if let titleLabel = stackView.arrangedSubviews.last as? UILabel {
+                    titleLabel.textColor = isSelected ? selectedColor : unselectedColor
+                }
+            }
+        }
     }
     
     func switchToViewController(_ newViewController: UIViewController, newViewController newVC: UIViewController? = nil) {
@@ -225,18 +324,49 @@ class CustomTabBarController: UIViewController {
 
 // MARK: - Custom Tab Button
 class TabButton: UIButton {
-    
+
     private let iconImageView = UIImageView()
     private let customTitleLabel = UILabel()
     private let stackView = UIStackView()
-    
+    private let circularBackground = UIView()
+    private let overlayView = UIView()
+
     private let selectedColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
-    private let unselectedColor = UIColor.gray
-    
-    init(icon: String, title: String, isSelected: Bool = false) {
+    private let unselectedColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+    private let isCenterButton: Bool
+
+    init(icon: String, title: String, isSelected: Bool = false, isCenterButton: Bool = false) {
+        self.isCenterButton = isCenterButton
         super.init(frame: .zero)
         setupUI(icon: icon, title: title)
         setSelected(isSelected)
+
+        // Debug: Add visible background to see touch area
+        self.backgroundColor = UIColor.green.withAlphaComponent(0.5)
+        self.layer.borderWidth = 2
+        self.layer.borderColor = UIColor.red.cgColor
+
+        // Add touch event handlers for overlay effect
+        if isCenterButton {
+            addTarget(self, action: #selector(buttonPressed), for: .touchDown)
+            addTarget(self, action: #selector(buttonReleased), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        }
+    }
+
+    @objc private func buttonPressed() {
+        if isCenterButton {
+            UIView.animate(withDuration: 0.1) {
+                self.overlayView.alpha = 1
+            }
+        }
+    }
+
+    @objc private func buttonReleased() {
+        if isCenterButton {
+            UIView.animate(withDuration: 0.2) {
+                self.overlayView.alpha = 0
+            }
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -244,40 +374,83 @@ class TabButton: UIButton {
     }
     
     private func setupUI(icon: String, title: String) {
-        // Stack View
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .vertical
-        stackView.alignment = .center
-        stackView.spacing = 4
-        stackView.isUserInteractionEnabled = false
-        addSubview(stackView)
-        
-        // Icon
-        iconImageView.translatesAutoresizingMaskIntoConstraints = false
-        iconImageView.image = UIImage(systemName: icon)
-        iconImageView.contentMode = .scaleAspectFit
-        stackView.addArrangedSubview(iconImageView)
-        
-        // Title
-        customTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        customTitleLabel.text = title
-        customTitleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        customTitleLabel.textAlignment = .center
-        stackView.addArrangedSubview(customTitleLabel)
-        
-        // Constraints
-        NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            iconImageView.widthAnchor.constraint(equalToConstant: 20),
-            iconImageView.heightAnchor.constraint(equalToConstant: 20)
-        ])
+        if isCenterButton {
+            // Center button with circular background
+            circularBackground.translatesAutoresizingMaskIntoConstraints = false
+            circularBackground.backgroundColor = selectedColor
+            circularBackground.layer.cornerRadius = 30
+            addSubview(circularBackground)
+
+            iconImageView.translatesAutoresizingMaskIntoConstraints = false
+            iconImageView.image = UIImage(systemName: icon)
+            iconImageView.contentMode = .scaleAspectFit
+            iconImageView.tintColor = UIColor.white
+            circularBackground.addSubview(iconImageView)
+
+            // Add overlay view for visual feedback
+            overlayView.translatesAutoresizingMaskIntoConstraints = false
+            overlayView.backgroundColor = UIColor.white.withAlphaComponent(0.15)
+            overlayView.layer.cornerRadius = 30
+            overlayView.isUserInteractionEnabled = false
+            overlayView.alpha = 0
+            circularBackground.addSubview(overlayView)
+
+            NSLayoutConstraint.activate([
+                circularBackground.centerXAnchor.constraint(equalTo: centerXAnchor),
+                circularBackground.centerYAnchor.constraint(equalTo: centerYAnchor),
+                circularBackground.widthAnchor.constraint(equalToConstant: 60),
+                circularBackground.heightAnchor.constraint(equalToConstant: 60),
+
+                iconImageView.centerXAnchor.constraint(equalTo: circularBackground.centerXAnchor),
+                iconImageView.centerYAnchor.constraint(equalTo: circularBackground.centerYAnchor),
+                iconImageView.widthAnchor.constraint(equalToConstant: 24),
+                iconImageView.heightAnchor.constraint(equalToConstant: 24),
+
+                // Overlay constraints - same as circular background
+                overlayView.centerXAnchor.constraint(equalTo: circularBackground.centerXAnchor),
+                overlayView.centerYAnchor.constraint(equalTo: circularBackground.centerYAnchor),
+                overlayView.widthAnchor.constraint(equalTo: circularBackground.widthAnchor),
+                overlayView.heightAnchor.constraint(equalTo: circularBackground.heightAnchor)
+            ])
+        } else {
+            // Regular tab button
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            stackView.axis = .vertical
+            stackView.alignment = .center
+            stackView.spacing = 4
+            stackView.isUserInteractionEnabled = false
+            addSubview(stackView)
+
+            iconImageView.translatesAutoresizingMaskIntoConstraints = false
+            iconImageView.image = UIImage(systemName: icon)
+            iconImageView.contentMode = .scaleAspectFit
+            stackView.addArrangedSubview(iconImageView)
+
+            customTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+            customTitleLabel.text = title
+            customTitleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+            customTitleLabel.textAlignment = .center
+            stackView.addArrangedSubview(customTitleLabel)
+
+            NSLayoutConstraint.activate([
+                stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor),
+                iconImageView.widthAnchor.constraint(equalToConstant: 20),
+                iconImageView.heightAnchor.constraint(equalToConstant: 20)
+            ])
+        }
     }
     
     func setSelected(_ selected: Bool) {
-        let color = selected ? selectedColor : unselectedColor
-        iconImageView.tintColor = color
-        customTitleLabel.textColor = color
+        if isCenterButton {
+            // Center button always keeps its circular background
+            circularBackground.backgroundColor = selectedColor
+            iconImageView.tintColor = UIColor.white
+        } else {
+            let color = selected ? selectedColor : unselectedColor
+            iconImageView.tintColor = color
+            customTitleLabel.textColor = color
+        }
     }
 }
 
@@ -288,20 +461,20 @@ extension CustomTabBarController {
     func selectHomeTab() {
         selectTab(at: 0)
     }
-    
-    func selectMoodTab() {
+
+    func selectLibraryTab() {
         selectTab(at: 1)
     }
-    
-    func selectRelaxTab() {
+
+    func selectChatTab() {
         selectTab(at: 2)
     }
-    
-    func selectReflectTab() {
+
+    func selectJournalTab() {
         selectTab(at: 3)
     }
-    
-    func selectMoreTab() {
+
+    func selectProfileTab() {
         selectTab(at: 4)
     }
     
