@@ -1158,18 +1158,15 @@ class ActualChatViewController: UIViewController {
         messages = [
             ChatMessage(
                 text: categorySpecificMessage,
-                isFromIris: true,
-                timestamp: "2:14 PM"
+                isFromIris: true
             ),
             ChatMessage(
                 text: "I've been feeling uncertain about this lately.",
-                isFromIris: false,
-                timestamp: "2:15 PM"
+                isFromIris: false
             ),
             ChatMessage(
                 text: "Thank you for sharing that with me. Uncertainty can be a sacred space where transformation begins. What would it feel like to trust the process?",
-                isFromIris: true,
-                timestamp: "2:15 PM"
+                isFromIris: true
             )
         ]
         
@@ -1238,8 +1235,7 @@ class ActualChatViewController: UIViewController {
         
         let userMessage = ChatMessage(
             text: text,
-            isFromIris: false,
-            timestamp: getCurrentTimeString()
+            isFromIris: false
         )
         
         hideTypingIndicator()
@@ -1268,8 +1264,7 @@ class ActualChatViewController: UIViewController {
         
         let irisMessage = ChatMessage(
             text: responses.randomElement() ?? responses[0],
-            isFromIris: true,
-            timestamp: getCurrentTimeString()
+            isFromIris: true
         )
         
         hideTypingIndicator()

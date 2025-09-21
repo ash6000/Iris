@@ -21,6 +21,15 @@ struct ChatMessage {
     let text: String
     let isFromIris: Bool
     let timestamp: String
+
+    init(text: String, isFromIris: Bool) {
+        self.text = text
+        self.isFromIris = isFromIris
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        self.timestamp = formatter.string(from: Date())
+    }
 }
 
 // MARK: - CategoryData Extension (Conversion Helper)

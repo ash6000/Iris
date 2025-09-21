@@ -72,14 +72,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // MARK: - Helper Methods
     private func determineInitialViewController() -> UIViewController {
-        // TODO: Add Firebase auth check here
-        // if Auth.auth().currentUser != nil {
-        //     return CustomTabBarController()
-        // } else {
-        //     return IrisWelcomeViewController()
-        // }
-        
-        // For now, always show welcome screen
+        // For now, always show welcome screen for testing
         return IrisWelcomeViewController()
     }
 

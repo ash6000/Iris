@@ -676,7 +676,7 @@ class ImmersiveChatViewController: UIViewController {
         textField.resignFirstResponder()
         
         // Add user message to messages array
-        let userMessage = ChatMessage(text: text, isFromIris: false, timestamp: getCurrentTimeString())
+        let userMessage = ChatMessage(text: text, isFromIris: false)
         messages.append(userMessage)
         
         // Generate and speak response
@@ -690,7 +690,7 @@ class ImmersiveChatViewController: UIViewController {
         ]
         
         let response = responses.randomElement() ?? responses[0]
-        let irisMessage = ChatMessage(text: response, isFromIris: true, timestamp: getCurrentTimeString())
+        let irisMessage = ChatMessage(text: response, isFromIris: true)
         messages.append(irisMessage)
         
         // Speak the response instead of showing text

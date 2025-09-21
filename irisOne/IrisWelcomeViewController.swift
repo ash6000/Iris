@@ -17,6 +17,7 @@ class IrisWelcomeViewController: UIViewController {
     private let termsLabel = UILabel()
     
     private let emailTextField = UITextField()
+    private let passwordTextField = UITextField()
     private let startButton = UIButton()
     
     private var isTermsAgreed = false
@@ -175,7 +176,7 @@ class IrisWelcomeViewController: UIViewController {
         
         // Email Text Field
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "Email (optional)"
+        emailTextField.placeholder = "Email"
         emailTextField.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         emailTextField.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
         emailTextField.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 0.6)
@@ -187,11 +188,29 @@ class IrisWelcomeViewController: UIViewController {
         emailTextField.rightViewMode = .always
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
+        emailTextField.autocorrectionType = .no
         contentContainer.addSubview(emailTextField)
+        
+        // Password Text Field
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordTextField.placeholder = "Password"
+        passwordTextField.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        passwordTextField.textColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1.0)
+        passwordTextField.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.82, alpha: 0.6)
+        passwordTextField.layer.cornerRadius = 28
+        passwordTextField.layer.borderWidth = 0
+        passwordTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 0))
+        passwordTextField.leftViewMode = .always
+        passwordTextField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 0))
+        passwordTextField.rightViewMode = .always
+        passwordTextField.isSecureTextEntry = true
+        passwordTextField.autocapitalizationType = .none
+        passwordTextField.autocorrectionType = .no
+        contentContainer.addSubview(passwordTextField)
         
         // Start Button
         startButton.translatesAutoresizingMaskIntoConstraints = false
-        startButton.setTitle("Start Now", for: .normal)
+        startButton.setTitle("Sign Up", for: .normal)
         startButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         startButton.backgroundColor = UIColor(red: 0.85, green: 0.7, blue: 0.8, alpha: 1.0)
         startButton.setTitleColor(.white, for: .normal)
@@ -315,8 +334,14 @@ class IrisWelcomeViewController: UIViewController {
             emailTextField.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
             emailTextField.heightAnchor.constraint(equalToConstant: 56),
             
+            // Password Text Field
+            passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 16),
+            passwordTextField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 24),
+            passwordTextField.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
+            passwordTextField.heightAnchor.constraint(equalToConstant: 56),
+            
             // Start Button
-            startButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 20),
+            startButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
             startButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 24),
             startButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
             startButton.heightAnchor.constraint(equalToConstant: 56),
@@ -348,12 +373,24 @@ class IrisWelcomeViewController: UIViewController {
     @objc private func startButtonTapped() {
         guard isTermsAgreed else { return }
         
-        // Handle start button tap
+        // Get email and password (optional for now)
         let email = emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        print("Starting with email: \(email)")
+        let password = passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         
-        // Navigate to main app by replacing the root view controller
-        let customTabBarController = CustomTabBarController()
+        // Save user credentials if provided
+        if !email.isEmpty && !password.isEmpty {
+            saveUserCredentials(email: email, password: password)
+            print("Signing up with email: \(email)")
+        } else {
+            // Mark as guest user for now
+            UserDefaults.standard.set(true, forKey: "user_signed_up")
+            UserDefaults.standard.set(Date(), forKey: "signup_date")
+            UserDefaults.standard.synchronize()
+            print("Signing up as guest user")
+        }
+        
+        // Navigate to Create Profile screen
+        let createProfileVC = CreateProfileViewController()
         
         // Get the window scene and replace the root view controller
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -361,9 +398,34 @@ class IrisWelcomeViewController: UIViewController {
             
             // Animate the transition
             UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                window.rootViewController = customTabBarController
+                window.rootViewController = createProfileVC
             }, completion: nil)
         }
+    }
+    
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
+    }
+    
+    private func saveUserCredentials(email: String, password: String) {
+        // Save to UserDefaults (will replace with Firebase later)
+        UserDefaults.standard.set(email, forKey: "user_email")
+        UserDefaults.standard.set(password, forKey: "user_password") // Note: In production, never save plain text passwords
+        UserDefaults.standard.set(true, forKey: "user_signed_up")
+        UserDefaults.standard.set(Date(), forKey: "signup_date")
+        UserDefaults.standard.synchronize()
+        
+        print("✅ User credentials saved:")
+        print("- Email: \(email)")
+        print("- Password: [Protected]")
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     private func updateStartButtonState() {
