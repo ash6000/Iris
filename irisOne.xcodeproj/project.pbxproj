@@ -14,6 +14,11 @@
 		BE1501162E7F59B100679420 /* PersonalityQuestionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501152E7F59B100679420 /* PersonalityQuestionsViewController.swift */; };
 		BE1501182E7F8C3C00679420 /* PersonalizedChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501172E7F8C3C00679420 /* PersonalizedChatViewController.swift */; };
 		BE15011A2E7FE1FD00679420 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501192E7FE1FD00679420 /* ProfileViewController.swift */; };
+		BE15011C2E80993100679420 /* JournalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15011B2E80993100679420 /* JournalViewController.swift */; };
+		BE15011E2E80A70600679420 /* EntryMethodModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15011D2E80A70600679420 /* EntryMethodModalViewController.swift */; };
+		BE1501202E80AE7B00679420 /* VoiceEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */; };
+		BE1501222E80B2E900679420 /* TextEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501212E80B2E900679420 /* TextEntryViewController.swift */; };
+		BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -68,6 +73,11 @@
 		BE1501152E7F59B100679420 /* PersonalityQuestionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalityQuestionsViewController.swift; sourceTree = "<group>"; };
 		BE1501172E7F8C3C00679420 /* PersonalizedChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonalizedChatViewController.swift; sourceTree = "<group>"; };
 		BE1501192E7FE1FD00679420 /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		BE15011B2E80993100679420 /* JournalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JournalViewController.swift; sourceTree = "<group>"; };
+		BE15011D2E80A70600679420 /* EntryMethodModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryMethodModalViewController.swift; sourceTree = "<group>"; };
+		BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceEntryViewController.swift; sourceTree = "<group>"; };
+		BE1501212E80B2E900679420 /* TextEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEntryViewController.swift; sourceTree = "<group>"; };
+		BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryViewController.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -129,6 +139,11 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */,
+				BE1501212E80B2E900679420 /* TextEntryViewController.swift */,
+				BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */,
+				BE15011D2E80A70600679420 /* EntryMethodModalViewController.swift */,
+				BE15011B2E80993100679420 /* JournalViewController.swift */,
 				BE1501192E7FE1FD00679420 /* ProfileViewController.swift */,
 				BE1501172E7F8C3C00679420 /* PersonalizedChatViewController.swift */,
 				BE1501152E7F59B100679420 /* PersonalityQuestionsViewController.swift */,
@@ -338,6 +353,7 @@
 				BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */,
 				BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */,
 				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
+				BE1501202E80AE7B00679420 /* VoiceEntryViewController.swift in Sources */,
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
 				BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */,
 				BE15011A2E7FE1FD00679420 /* ProfileViewController.swift in Sources */,
@@ -352,13 +368,17 @@
 				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
 				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
+				BE15011E2E80A70600679420 /* EntryMethodModalViewController.swift in Sources */,
+				BE1501222E80B2E900679420 /* TextEntryViewController.swift in Sources */,
 				BE15010D2E7F403800679420 /* CreateProfileViewController.swift in Sources */,
 				BE6EBB9A2E36A8B2004F4D5A /* ImmersiveChatViewController.swift in Sources */,
+				BE15011C2E80993100679420 /* JournalViewController.swift in Sources */,
 				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
 				BED105CE2E440D6F00235A60 /* VoiceRecordingManager.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
 				BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */,
+				BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */,
 				BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */,
 				BE1501162E7F59B100679420 /* PersonalityQuestionsViewController.swift in Sources */,
 			);

@@ -39,11 +39,6 @@ class SettingsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-
-        // Ensure tab bar is visible when returning to settings
-        if let tabBarController = self.tabBarController {
-            tabBarController.tabBar.isHidden = false
-        }
     }
 
     // MARK: - Setup Methods

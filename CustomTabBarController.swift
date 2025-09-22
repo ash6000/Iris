@@ -55,8 +55,9 @@ class CustomTabBarController: UIViewController {
         relaxNavigationController = UINavigationController(rootViewController: chatVC)
         relaxNavigationController.isNavigationBarHidden = true
 
-        // Journal tab - Placeholder for now
-        reflectNavigationController = UINavigationController(rootViewController: createPlaceholderVC(title: "Journal Coming Soon", color: .systemBrown))
+        // Journal tab - JournalViewController
+        let journalVC = JournalViewController()
+        reflectNavigationController = UINavigationController(rootViewController: journalVC)
         reflectNavigationController.isNavigationBarHidden = true
 
         // Profile tab - Settings
@@ -237,15 +238,22 @@ class CustomTabBarController: UIViewController {
         // If immersive view is showing, dismiss it first
         dismissImmersiveChat()
         
-        // Handle Home tab re-selection to go back to category list
-        if index == selectedTabIndex && index == 0 && currentViewController != nil {
-            // Pop to root view controller in home navigation
-            homeNavigationController?.popToRootViewController(animated: true)
-            return
-        }
-        
-        // Don't prevent initial selection
-        if currentViewController != nil && index == selectedTabIndex && index != 0 {
+        // Handle tab re-selection to go back to root view controller
+        if index == selectedTabIndex && currentViewController != nil {
+            switch index {
+            case 0: // Home tab
+                homeNavigationController?.popToRootViewController(animated: true)
+            case 1: // Library tab
+                moodNavigationController?.popToRootViewController(animated: true)
+            case 2: // Chat tab
+                relaxNavigationController?.popToRootViewController(animated: true)
+            case 3: // Journal tab
+                reflectNavigationController?.popToRootViewController(animated: true)
+            case 4: // Profile tab
+                moreNavigationController?.popToRootViewController(animated: true)
+            default:
+                break
+            }
             return
         }
         

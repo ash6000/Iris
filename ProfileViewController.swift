@@ -72,16 +72,6 @@ class ProfileViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-
-        // Ensure tab bar remains visible
-        if let tabBarController = self.tabBarController {
-            tabBarController.tabBar.isHidden = false
-        }
-
-        // For CustomTabBarController, ensure tab bar is visible
-        if let customTabBarController = findCustomTabBarController() {
-            // The tab bar should remain visible when navigating within the navigation stack
-        }
     }
 
     // MARK: - Setup Methods
@@ -618,17 +608,5 @@ class ProfileViewController: UIViewController {
 
     @objc private func editProfileButtonTapped() {
         print("Edit profile button tapped")
-    }
-
-    // MARK: - Helper Methods
-    private func findCustomTabBarController() -> CustomTabBarController? {
-        var currentController: UIViewController? = self
-        while let controller = currentController {
-            if let customTabBarController = controller as? CustomTabBarController {
-                return customTabBarController
-            }
-            currentController = controller.parent
-        }
-        return nil
     }
 }
