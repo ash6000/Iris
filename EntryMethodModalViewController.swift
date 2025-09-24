@@ -359,7 +359,7 @@ class EntryMethodModalViewController: UIViewController {
 
         // If the presenting VC is a navigation controller, use it directly
         if let navController = currentVC as? UINavigationController {
-            let voiceEntryVC = VoiceEntryViewController()
+            let voiceEntryVC = VoiceEntryViewController_MVVM()
             navController.pushViewController(voiceEntryVC, animated: true)
             return
         }
@@ -367,7 +367,7 @@ class EntryMethodModalViewController: UIViewController {
         // Otherwise, find the navigation controller in the hierarchy
         while currentVC != nil {
             if let navController = currentVC?.navigationController {
-                let voiceEntryVC = VoiceEntryViewController()
+                let voiceEntryVC = VoiceEntryViewController_MVVM()
                 navController.pushViewController(voiceEntryVC, animated: true)
                 return
             }
@@ -383,7 +383,7 @@ class EntryMethodModalViewController: UIViewController {
             if let customTabBar = rootVC as? CustomTabBarController {
                 // Find the journal navigation controller (index 3 based on CustomTabBarController setup)
                 if let journalNavController = customTabBar.reflectNavigationController {
-                    let voiceEntryVC = VoiceEntryViewController()
+                    let voiceEntryVC = VoiceEntryViewController_MVVM()
                     journalNavController.pushViewController(voiceEntryVC, animated: true)
                 }
             }
@@ -396,7 +396,7 @@ class EntryMethodModalViewController: UIViewController {
 
         // If the presenting VC is a navigation controller, use it directly
         if let navController = currentVC as? UINavigationController {
-            let textEntryVC = TextEntryViewController()
+            let textEntryVC = TextEntryViewController_MVVM()
             navController.pushViewController(textEntryVC, animated: true)
             return
         }
@@ -404,7 +404,7 @@ class EntryMethodModalViewController: UIViewController {
         // Otherwise, find the navigation controller in the hierarchy
         while currentVC != nil {
             if let navController = currentVC?.navigationController {
-                let textEntryVC = TextEntryViewController()
+                let textEntryVC = TextEntryViewController_MVVM()
                 navController.pushViewController(textEntryVC, animated: true)
                 return
             }
@@ -420,7 +420,7 @@ class EntryMethodModalViewController: UIViewController {
             if let customTabBar = rootVC as? CustomTabBarController {
                 // Find the journal navigation controller (index 3 based on CustomTabBarController setup)
                 if let journalNavController = customTabBar.reflectNavigationController {
-                    let textEntryVC = TextEntryViewController()
+                    let textEntryVC = TextEntryViewController_MVVM()
                     journalNavController.pushViewController(textEntryVC, animated: true)
                 }
             }
@@ -433,7 +433,7 @@ class EntryMethodModalViewController: UIViewController {
 
         // If the presenting VC is a navigation controller, use it directly
         if let navController = currentVC as? UINavigationController {
-            let guidedEntryVC = GuidedEntryViewController()
+            let guidedEntryVC = GuidedEntryViewController_MVVM()
             navController.pushViewController(guidedEntryVC, animated: true)
             return
         }
@@ -441,7 +441,7 @@ class EntryMethodModalViewController: UIViewController {
         // Otherwise, find the navigation controller in the hierarchy
         while currentVC != nil {
             if let navController = currentVC?.navigationController {
-                let guidedEntryVC = GuidedEntryViewController()
+                let guidedEntryVC = GuidedEntryViewController_MVVM()
                 navController.pushViewController(guidedEntryVC, animated: true)
                 return
             }
@@ -457,7 +457,7 @@ class EntryMethodModalViewController: UIViewController {
             if let customTabBar = rootVC as? CustomTabBarController {
                 // Find the journal navigation controller (index 3 based on CustomTabBarController setup)
                 if let journalNavController = customTabBar.reflectNavigationController {
-                    let guidedEntryVC = GuidedEntryViewController()
+                    let guidedEntryVC = GuidedEntryViewController_MVVM()
                     journalNavController.pushViewController(guidedEntryVC, animated: true)
                 }
             }

@@ -1,13 +1,7 @@
-//
-//  GuidedEntryViewController.swift
-//  irisOne
-//
-//  Created by Test User on 9/21/25.
-//
-
 import UIKit
 
-class GuidedEntryViewController: UIViewController {
+class GuidedEntryViewController_MVVM: UIViewController {
+    private let viewModel = GuidedEntryViewModel()
 
     // MARK: - UI Components
     private let tableView = UITableView()
@@ -24,7 +18,6 @@ class GuidedEntryViewController: UIViewController {
     private let voiceButton = UIButton()
     private let calendarButton = UIButton()
 
-
     // Chat messages data
     private var messages: [GuidedJournalMessage] = []
 
@@ -34,8 +27,9 @@ class GuidedEntryViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupActions()
-        setupInitialMessages()
         setupKeyboardHandling()
+        bindViewModel()
+        setupInitialMessages()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -131,7 +125,6 @@ class GuidedEntryViewController: UIViewController {
         inputContainerView.addSubview(calendarButton)
     }
 
-
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // Header
@@ -172,7 +165,6 @@ class GuidedEntryViewController: UIViewController {
             calendarButton.trailingAnchor.constraint(equalTo: inputContainerView.trailingAnchor, constant: -16),
             calendarButton.widthAnchor.constraint(equalToConstant: 40),
             calendarButton.heightAnchor.constraint(equalToConstant: 40),
-
         ])
     }
 
@@ -201,44 +193,30 @@ class GuidedEntryViewController: UIViewController {
         )
     }
 
-    private func setupInitialMessages() {
-        messages = [
-            GuidedJournalMessage(
-                type: GuidedJournalMessage.MessageType.intro,
-                content: "What's on your mind today? Do you want today's backup prompt?",
-                isUser: false
-            ),
-            GuidedJournalMessage(
-                type: GuidedJournalMessage.MessageType.moodSelection,
-                content: "How are you feeling right now?",
-                isUser: false
-            ),
-            GuidedJournalMessage(
-                type: GuidedJournalMessage.MessageType.aiMessage,
-                content: "I sense you might be carrying some weight today. What's been on your heart lately?",
-                isUser: false
-            ),
-            GuidedJournalMessage(
-                type: GuidedJournalMessage.MessageType.userMessage,
-                content: "I'm feeling overwhelmed with work and personal stuff. Everything feels like it's piling up.",
-                isUser: true
-            ),
-            GuidedJournalMessage(
-                type: GuidedJournalMessage.MessageType.aiMessage,
-                content: "That feeling of overwhelm is so human and valid. Let's breathe through this together. Can you name one small thing that brought you even a moment of peace today?",
-                isUser: false
-            )
-        ]
-
-        tableView.reloadData()
-
-        // Scroll to bottom
-        DispatchQueue.main.async {
-            if !self.messages.isEmpty {
-                let indexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
+    private func bindViewModel() {
+        viewModel.$messages.bind(self) { [weak self] (messages: [GuidedJournalMessage]) in
+            DispatchQueue.main.async {
+                self?.messages = messages
+                self?.tableView.reloadData()
+                self?.scrollToBottom()
             }
         }
+
+        viewModel.$isTyping.bind(self) { [weak self] isTyping in
+            DispatchQueue.main.async {
+                self?.inputTextField.isEnabled = !isTyping
+            }
+        }
+
+        viewModel.$canSendMessage.bind(self) { [weak self] canSend in
+            DispatchQueue.main.async {
+                self?.inputTextField.isEnabled = canSend
+            }
+        }
+    }
+
+    private func setupInitialMessages() {
+        viewModel.startSession()
     }
 
     // MARK: - Actions
@@ -278,7 +256,6 @@ class GuidedEntryViewController: UIViewController {
     }
 
     @objc private func keyboardWillHide(notification: NSNotification) {
-
         UIView.animate(withDuration: 0.3) {
             self.view.frame.origin.y = 0
         }
@@ -288,36 +265,10 @@ class GuidedEntryViewController: UIViewController {
         guard let text = inputTextField.text, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
         // Add user message
-        let userMessage = GuidedJournalMessage(type: GuidedJournalMessage.MessageType.userMessage, content: text, isUser: true)
-        messages.append(userMessage)
+        viewModel.sendUserMessage(text)
 
         // Clear input
         inputTextField.text = ""
-
-        // Reload and scroll
-        tableView.reloadData()
-        scrollToBottom()
-
-        // Simulate AI response after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.addAIResponse()
-        }
-    }
-
-    private func addAIResponse() {
-        let responses = [
-            "That's a beautiful reflection. How does it feel to share that?",
-            "I hear you. What would you like to explore about that feeling?",
-            "Thank you for being so open. What comes up for you when you sit with that?",
-            "That sounds meaningful. Can you tell me more about what that experience was like?"
-        ]
-
-        let randomResponse = responses.randomElement() ?? responses[0]
-        let aiMessage = GuidedJournalMessage(type: GuidedJournalMessage.MessageType.aiMessage, content: randomResponse, isUser: false)
-        messages.append(aiMessage)
-
-        tableView.reloadData()
-        scrollToBottom()
     }
 
     private func scrollToBottom() {
@@ -335,7 +286,7 @@ class GuidedEntryViewController: UIViewController {
 }
 
 // MARK: - UITableViewDataSource
-extension GuidedEntryViewController: UITableViewDataSource {
+extension GuidedEntryViewController_MVVM: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
@@ -365,7 +316,7 @@ extension GuidedEntryViewController: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
-extension GuidedEntryViewController: UITableViewDelegate {
+extension GuidedEntryViewController_MVVM: UITableViewDelegate {
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }

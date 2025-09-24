@@ -55,8 +55,8 @@ class CustomTabBarController: UIViewController {
         relaxNavigationController = UINavigationController(rootViewController: chatVC)
         relaxNavigationController.isNavigationBarHidden = true
 
-        // Journal tab - JournalViewController
-        let journalVC = JournalViewController()
+        // Journal tab - JournalViewController_MVVM
+        let journalVC = JournalViewController_MVVM()
         reflectNavigationController = UINavigationController(rootViewController: journalVC)
         reflectNavigationController.isNavigationBarHidden = true
 

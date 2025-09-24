@@ -19,6 +19,17 @@
 		BE1501202E80AE7B00679420 /* VoiceEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */; };
 		BE1501222E80B2E900679420 /* TextEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501212E80B2E900679420 /* TextEntryViewController.swift */; };
 		BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */; };
+		BE1501402E83931D00679420 /* GuidedEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013A2E83931D00679420 /* GuidedEntryViewModel.swift */; };
+		BE1501412E83931D00679420 /* TextEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013B2E83931D00679420 /* TextEntryViewModel.swift */; };
+		BE1501422E83931D00679420 /* ViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013C2E83931D00679420 /* ViewModelProtocol.swift */; };
+		BE1501432E83931D00679420 /* BaseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013D2E83931D00679420 /* BaseViewModel.swift */; };
+		BE1501442E83931D00679420 /* VoiceEntryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013E2E83931D00679420 /* VoiceEntryViewModel.swift */; };
+		BE1501452E83931D00679420 /* JournalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15013F2E83931D00679420 /* JournalViewModel.swift */; };
+		BE15014A2E83933B00679420 /* GuidedEntryViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501462E83933A00679420 /* GuidedEntryViewController_MVVM.swift */; };
+		BE15014B2E83933B00679420 /* VoiceEntryViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501472E83933B00679420 /* VoiceEntryViewController_MVVM.swift */; };
+		BE15014C2E83933B00679420 /* TextEntryViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */; };
+		BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */; };
+		BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -78,6 +89,17 @@
 		BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceEntryViewController.swift; sourceTree = "<group>"; };
 		BE1501212E80B2E900679420 /* TextEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEntryViewController.swift; sourceTree = "<group>"; };
 		BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryViewController.swift; sourceTree = "<group>"; };
+		BE15013A2E83931D00679420 /* GuidedEntryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GuidedEntryViewModel.swift; path = viewmodels/GuidedEntryViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BE15013B2E83931D00679420 /* TextEntryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextEntryViewModel.swift; path = viewmodels/TextEntryViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BE15013C2E83931D00679420 /* ViewModelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewModelProtocol.swift; path = viewmodels/ViewModelProtocol.swift; sourceTree = SOURCE_ROOT; };
+		BE15013D2E83931D00679420 /* BaseViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BaseViewModel.swift; path = viewmodels/BaseViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BE15013E2E83931D00679420 /* VoiceEntryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VoiceEntryViewModel.swift; path = viewmodels/VoiceEntryViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BE15013F2E83931D00679420 /* JournalViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JournalViewModel.swift; path = viewmodels/JournalViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BE1501462E83933A00679420 /* GuidedEntryViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
+		BE1501472E83933B00679420 /* VoiceEntryViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceEntryViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
+		BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEntryViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
+		BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JournalViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
+		BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryModels.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -136,9 +158,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE1501392E83912400679420 /* viewmodels */ = {
+			isa = PBXGroup;
+			children = (
+				BE15013D2E83931D00679420 /* BaseViewModel.swift */,
+				BE15013A2E83931D00679420 /* GuidedEntryViewModel.swift */,
+				BE15013F2E83931D00679420 /* JournalViewModel.swift */,
+				BE15013B2E83931D00679420 /* TextEntryViewModel.swift */,
+				BE15013C2E83931D00679420 /* ViewModelProtocol.swift */,
+				BE15013E2E83931D00679420 /* VoiceEntryViewModel.swift */,
+			);
+			path = viewmodels;
+			sourceTree = "<group>";
+		};
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */,
 				BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */,
 				BE1501212E80B2E900679420 /* TextEntryViewController.swift */,
 				BE15011F2E80AE7B00679420 /* VoiceEntryViewController.swift */,
@@ -188,6 +224,11 @@
 		BE9339CC2E2FEF7D00D1C95C /* irisOne */ = {
 			isa = PBXGroup;
 			children = (
+				BE1501462E83933A00679420 /* GuidedEntryViewController_MVVM.swift */,
+				BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */,
+				BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */,
+				BE1501472E83933B00679420 /* VoiceEntryViewController_MVVM.swift */,
+				BE1501392E83912400679420 /* viewmodels */,
 				BE9339CD2E2FEF7D00D1C95C /* AppDelegate.swift */,
 				BE9339CF2E2FEF7D00D1C95C /* SceneDelegate.swift */,
 				BE9339D12E2FEF7D00D1C95C /* ViewController.swift */,
@@ -354,12 +395,17 @@
 				BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */,
 				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
 				BE1501202E80AE7B00679420 /* VoiceEntryViewController.swift in Sources */,
+				BE1501432E83931D00679420 /* BaseViewModel.swift in Sources */,
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
 				BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */,
 				BE15011A2E7FE1FD00679420 /* ProfileViewController.swift in Sources */,
 				BE1501182E7F8C3C00679420 /* PersonalizedChatViewController.swift in Sources */,
 				BE6EBB902E354923004F4D5A /* ChatCategoryData.swift in Sources */,
+				BE1501412E83931D00679420 /* TextEntryViewModel.swift in Sources */,
+				BE1501422E83931D00679420 /* ViewModelProtocol.swift in Sources */,
 				BE6EBB982E355B65004F4D5A /* HomeViewController.swift in Sources */,
+				BE1501402E83931D00679420 /* GuidedEntryViewModel.swift in Sources */,
+				BE15014C2E83933B00679420 /* TextEntryViewController_MVVM.swift in Sources */,
 				BE6EBB922E354949004F4D5A /* ChatMessageCell.swift in Sources */,
 				BE1501122E7F4B9B00679420 /* WelcomeViewController.swift in Sources */,
 				BE1501102E7F430D00679420 /* EmailVerifyViewController.swift in Sources */,
@@ -367,17 +413,23 @@
 				BE15010E2E7F403800679420 /* LoginViewController.swift in Sources */,
 				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
 				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
+				BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
 				BE15011E2E80A70600679420 /* EntryMethodModalViewController.swift in Sources */,
+				BE1501442E83931D00679420 /* VoiceEntryViewModel.swift in Sources */,
+				BE15014A2E83933B00679420 /* GuidedEntryViewController_MVVM.swift in Sources */,
+				BE15014B2E83933B00679420 /* VoiceEntryViewController_MVVM.swift in Sources */,
 				BE1501222E80B2E900679420 /* TextEntryViewController.swift in Sources */,
 				BE15010D2E7F403800679420 /* CreateProfileViewController.swift in Sources */,
 				BE6EBB9A2E36A8B2004F4D5A /* ImmersiveChatViewController.swift in Sources */,
 				BE15011C2E80993100679420 /* JournalViewController.swift in Sources */,
 				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
+				BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */,
 				BED105CE2E440D6F00235A60 /* VoiceRecordingManager.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
 				BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */,
+				BE1501452E83931D00679420 /* JournalViewModel.swift in Sources */,
 				BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */,
 				BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */,
 				BE1501162E7F59B100679420 /* PersonalityQuestionsViewController.swift in Sources */,
