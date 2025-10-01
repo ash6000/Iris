@@ -30,6 +30,7 @@
 		BE15014C2E83933B00679420 /* TextEntryViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */; };
 		BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */; };
 		BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */; };
+		BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501502E8B833700679420 /* LunarCalendarViewController.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -100,6 +101,7 @@
 		BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEntryViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
 		BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JournalViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
 		BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryModels.swift; sourceTree = "<group>"; };
+		BE1501502E8B833700679420 /* LunarCalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LunarCalendarViewController.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE1501502E8B833700679420 /* LunarCalendarViewController.swift */,
 				BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */,
 				BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */,
 				BE1501212E80B2E900679420 /* TextEntryViewController.swift */,
@@ -427,6 +430,7 @@
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
 				BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */,
 				BED105CE2E440D6F00235A60 /* VoiceRecordingManager.swift in Sources */,
+				BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
 				BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */,
 				BE1501452E83931D00679420 /* JournalViewModel.swift in Sources */,

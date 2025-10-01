@@ -40,8 +40,9 @@ class CustomTabBarController: UIViewController {
     }
     
     private func setupViewControllers() {
-        // Home tab - Today's Mode (using MoodTrackingViewController for now)
-        let homeVC = MoodTrackingViewController()
+        // Home tab - New Home Screen Design
+        let homeVC = HomeViewController()
+        homeVC.customTabBarController = self
         homeNavigationController = UINavigationController(rootViewController: homeVC)
         homeNavigationController.isNavigationBarHidden = true
 
