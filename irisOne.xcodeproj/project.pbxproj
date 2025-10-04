@@ -33,6 +33,10 @@
 		BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501502E8B833700679420 /* LunarCalendarViewController.swift */; };
 		BE1501532E8CB99B00679420 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501522E8CB99B00679420 /* APIConfig.swift */; };
 		BE1501552E8CB9A700679420 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501542E8CB9A700679420 /* OpenAIService.swift */; };
+		BE15015A2E91BB0D00679420 /* VOICE_SETUP_INSTRUCTIONS.md in Resources */ = {isa = PBXBuildFile; fileRef = BE1501562E91BB0C00679420 /* VOICE_SETUP_INSTRUCTIONS.md */; };
+		BE15015B2E91BB0D00679420 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501572E91BB0C00679420 /* VoiceService.swift */; };
+		BE15015C2E91BB0D00679420 /* VoiceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501582E91BB0D00679420 /* VoiceButton.swift */; };
+		BE15015D2E91BB0D00679420 /* AudioMessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -106,6 +110,10 @@
 		BE1501502E8B833700679420 /* LunarCalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LunarCalendarViewController.swift; sourceTree = "<group>"; };
 		BE1501522E8CB99B00679420 /* APIConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		BE1501542E8CB9A700679420 /* OpenAIService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
+		BE1501562E91BB0C00679420 /* VOICE_SETUP_INSTRUCTIONS.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = VOICE_SETUP_INSTRUCTIONS.md; sourceTree = "<group>"; };
+		BE1501572E91BB0C00679420 /* VoiceService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
+		BE1501582E91BB0D00679420 /* VoiceButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceButton.swift; sourceTree = "<group>"; };
+		BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioMessageBubble.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -180,6 +188,10 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */,
+				BE1501562E91BB0C00679420 /* VOICE_SETUP_INSTRUCTIONS.md */,
+				BE1501582E91BB0D00679420 /* VoiceButton.swift */,
+				BE1501572E91BB0C00679420 /* VoiceService.swift */,
 				BE1501542E8CB9A700679420 /* OpenAIService.swift */,
 				BE1501522E8CB99B00679420 /* APIConfig.swift */,
 				BE1501502E8B833700679420 /* LunarCalendarViewController.swift */,
@@ -373,6 +385,7 @@
 			files = (
 				BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */,
 				BE9339DA2E2FEF8000D1C95C /* LaunchScreen.storyboard in Resources */,
+				BE15015A2E91BB0D00679420 /* VOICE_SETUP_INSTRUCTIONS.md in Resources */,
 				BE9339D72E2FEF8000D1C95C /* Assets.xcassets in Resources */,
 				BE9339D52E2FEF7D00D1C95C /* Main.storyboard in Resources */,
 			);
@@ -436,6 +449,8 @@
 				BE6EBB8E2E354904004F4D5A /* ActualChatViewController.swift in Sources */,
 				BE9339D02E2FEF7D00D1C95C /* SceneDelegate.swift in Sources */,
 				BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */,
+				BE15015B2E91BB0D00679420 /* VoiceService.swift in Sources */,
+				BE15015D2E91BB0D00679420 /* AudioMessageBubble.swift in Sources */,
 				BED105CE2E440D6F00235A60 /* VoiceRecordingManager.swift in Sources */,
 				BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
@@ -444,6 +459,7 @@
 				BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */,
 				BE1501552E8CB9A700679420 /* OpenAIService.swift in Sources */,
 				BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */,
+				BE15015C2E91BB0D00679420 /* VoiceButton.swift in Sources */,
 				BE1501162E7F59B100679420 /* PersonalityQuestionsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

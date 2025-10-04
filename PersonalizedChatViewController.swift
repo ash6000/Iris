@@ -38,11 +38,16 @@ class PersonalizedChatViewController: UIViewController {
     private let sendButton = UIButton()
     private let placeholderLabel = UILabel()
 
+    // Voice components
+    private let voiceModeToggle = UIButton()
+    private let voiceButton = VoiceButton()
+    private var isVoiceMode = false
 
     // Data
     private var personalityType: String?
     private var messages: [ChatMessage] = []
     private var typingIndicatorView: UIView?
+    private var currentPlayingBubble: AudioMessageBubble?
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -206,6 +211,23 @@ class PersonalizedChatViewController: UIViewController {
         sendButton.tintColor = UIColor.white
         sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
         inputBackgroundView.addSubview(sendButton)
+
+        // Voice Mode Toggle
+        voiceModeToggle.translatesAutoresizingMaskIntoConstraints = false
+        voiceModeToggle.setImage(UIImage(systemName: "mic"), for: .normal)
+        voiceModeToggle.setImage(UIImage(systemName: "mic.fill"), for: .selected)
+        voiceModeToggle.tintColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        voiceModeToggle.addTarget(self, action: #selector(voiceModeToggleTapped), for: .touchUpInside)
+        inputContainerView.addSubview(voiceModeToggle)
+
+        // Voice Button
+        voiceButton.translatesAutoresizingMaskIntoConstraints = false
+        voiceButton.delegate = self
+        voiceButton.isHidden = true
+        inputContainerView.addSubview(voiceButton)
+
+        // Setup VoiceService
+        VoiceService.shared.delegate = self
 
         updatePlaceholderVisibility()
     }
@@ -696,6 +718,18 @@ class PersonalizedChatViewController: UIViewController {
             sendButton.widthAnchor.constraint(equalToConstant: 40),
             sendButton.heightAnchor.constraint(equalToConstant: 40),
 
+            // Voice Mode Toggle
+            voiceModeToggle.leadingAnchor.constraint(equalTo: inputContainerView.leadingAnchor, constant: 16),
+            voiceModeToggle.centerYAnchor.constraint(equalTo: inputBackgroundView.centerYAnchor),
+            voiceModeToggle.widthAnchor.constraint(equalToConstant: 30),
+            voiceModeToggle.heightAnchor.constraint(equalToConstant: 30),
+
+            // Voice Button
+            voiceButton.centerXAnchor.constraint(equalTo: inputContainerView.centerXAnchor),
+            voiceButton.centerYAnchor.constraint(equalTo: inputBackgroundView.centerYAnchor),
+            voiceButton.widthAnchor.constraint(equalToConstant: 80),
+            voiceButton.heightAnchor.constraint(equalToConstant: 80),
+
         ])
     }
 
@@ -830,6 +864,139 @@ class PersonalizedChatViewController: UIViewController {
                 }
             }
         }
+    }
+
+    // MARK: - Voice Methods
+    @objc private func voiceModeToggleTapped() {
+        isVoiceMode.toggle()
+        updateInputMode()
+
+        // Request microphone permission if entering voice mode
+        if isVoiceMode {
+            VoiceService.shared.requestMicrophonePermission { [weak self] granted in
+                if !granted {
+                    self?.isVoiceMode = false
+                    self?.updateInputMode()
+                    self?.showMicrophonePermissionAlert()
+                }
+            }
+        }
+    }
+
+    private func updateInputMode() {
+        voiceModeToggle.isSelected = isVoiceMode
+
+        UIView.animate(withDuration: 0.3) {
+            self.inputBackgroundView.alpha = self.isVoiceMode ? 0.5 : 1.0
+            self.voiceButton.isHidden = !self.isVoiceMode
+            self.textInputView.isUserInteractionEnabled = !self.isVoiceMode
+            self.sendButton.isEnabled = !self.isVoiceMode
+        }
+    }
+
+    private func showMicrophonePermissionAlert() {
+        let alert = UIAlertController(
+            title: "Microphone Access Required",
+            message: "To use voice features, please enable microphone access in Settings.",
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        })
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    private func processVoiceToText(audioData: Data) {
+        // Show processing state
+        voiceButton.setState(.processing)
+
+        OpenAIService.shared.transcribeAudio(audioData: audioData) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let transcript):
+                    self?.handleVoiceTranscript(transcript, audioData: audioData)
+                case .failure(let error):
+                    self?.voiceButton.setState(.idle)
+                    self?.showVoiceError("Failed to process voice message: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func handleVoiceTranscript(_ transcript: String, audioData: Data) {
+        // Hide quick starters after first voice message
+        hideQuickStarters()
+
+        // Add user voice message
+        addVoiceMessage(text: transcript, audioData: audioData, isFromIris: false)
+
+        // Send to ChatGPT and get voice response
+        showTypingIndicator()
+
+        OpenAIService.shared.sendMessage(transcript) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.hideTypingIndicator()
+
+                switch result {
+                case .success(let response):
+                    self?.generateVoiceResponse(text: response)
+                case .failure(let error):
+                    let errorMessage = "I'm having trouble connecting right now. Please check your internet connection or try again later."
+                    self?.generateVoiceResponse(text: errorMessage)
+                    print("OpenAI Error: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func generateVoiceResponse(text: String) {
+        OpenAIService.shared.textToSpeech(text: text) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.voiceButton.setState(.idle)
+
+                switch result {
+                case .success(let audioData):
+                    self?.addVoiceMessage(text: text, audioData: audioData, isFromIris: true)
+                    self?.playVoiceResponse(audioData)
+                case .failure(let error):
+                    // Fallback to text message if TTS fails
+                    self?.addTypingMessage(text: text, isFromIris: true)
+                    print("TTS Error: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func playVoiceResponse(_ audioData: Data) {
+        VoiceService.shared.playAudio(data: audioData)
+    }
+
+    private func addVoiceMessage(text: String, audioData: Data, isFromIris: Bool) {
+        let audioBubble = AudioMessageBubble(
+            isFromIris: isFromIris,
+            audioData: audioData,
+            transcript: text,
+            duration: estimateAudioDuration(data: audioData)
+        )
+        audioBubble.delegate = self
+        messagesStackView.addArrangedSubview(audioBubble)
+        scrollToBottom()
+    }
+
+    private func estimateAudioDuration(data: Data) -> TimeInterval {
+        // Rough estimation: 1 second per 16KB for typical speech audio
+        return max(1.0, Double(data.count) / 16000.0)
+    }
+
+    private func showVoiceError(_ message: String) {
+        let alert = UIAlertController(title: "Voice Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 
     private func addMessage(text: String, isFromIris: Bool) {
@@ -1050,6 +1217,86 @@ extension PersonalizedChatViewController: UITextViewDelegate {
         let newHeight = min(newSize.height, maxHeight)
 
         textView.isScrollEnabled = newHeight >= maxHeight
+    }
+}
+
+// MARK: - VoiceButtonDelegate
+extension PersonalizedChatViewController: VoiceButtonDelegate {
+    func voiceButtonDidStartRecording() {
+        VoiceService.shared.startRecording()
+    }
+
+    func voiceButtonDidStopRecording() {
+        VoiceService.shared.stopRecording()
+    }
+
+    func voiceButtonDidCancel() {
+        VoiceService.shared.stopRecording()
+        voiceButton.setState(.idle)
+    }
+}
+
+// MARK: - VoiceServiceDelegate
+extension PersonalizedChatViewController: VoiceServiceDelegate {
+    func voiceServiceDidStartRecording() {
+        voiceButton.setState(.recording)
+    }
+
+    func voiceServiceDidStopRecording() {
+        voiceButton.setState(.processing)
+    }
+
+    func voiceServiceDidFinishRecording(audioData: Data?, success: Bool) {
+        if success, let audioData = audioData {
+            processVoiceToText(audioData: audioData)
+        } else {
+            voiceButton.setState(.idle)
+            showVoiceError("Failed to record audio")
+        }
+    }
+
+    func voiceServiceDidStartPlaying() {
+        // Update UI to show playing state
+    }
+
+    func voiceServiceDidFinishPlaying() {
+        currentPlayingBubble?.setPlayingState(false)
+        currentPlayingBubble = nil
+    }
+
+    func voiceServiceRecordingTimeDidUpdate(_ time: TimeInterval) {
+        // Update voice button with audio level if needed
+        let audioLevel = VoiceService.shared.getAudioLevel()
+        voiceButton.updateAudioLevel(audioLevel)
+    }
+
+    func voiceServiceDidFailWithError(_ error: Error) {
+        voiceButton.setState(.idle)
+        showVoiceError(error.localizedDescription)
+    }
+}
+
+// MARK: - AudioMessageBubbleDelegate
+extension PersonalizedChatViewController: AudioMessageBubbleDelegate {
+    func audioMessageBubbleDidTapPlay(_ bubble: AudioMessageBubble) {
+        // Stop any currently playing audio
+        if let currentBubble = currentPlayingBubble {
+            currentBubble.setPlayingState(false)
+            VoiceService.shared.stopPlayback()
+        }
+
+        // Start playing this audio
+        if let audioData = bubble.getAudioData() {
+            currentPlayingBubble = bubble
+            bubble.setPlayingState(true)
+            VoiceService.shared.playAudio(data: audioData)
+        }
+    }
+
+    func audioMessageBubbleDidTapPause(_ bubble: AudioMessageBubble) {
+        bubble.setPlayingState(false)
+        VoiceService.shared.stopPlayback()
+        currentPlayingBubble = nil
     }
 }
 
