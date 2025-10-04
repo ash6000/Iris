@@ -31,6 +31,8 @@
 		BE15014D2E83933B00679420 /* JournalViewController_MVVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */; };
 		BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */; };
 		BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501502E8B833700679420 /* LunarCalendarViewController.swift */; };
+		BE1501532E8CB99B00679420 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501522E8CB99B00679420 /* APIConfig.swift */; };
+		BE1501552E8CB9A700679420 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501542E8CB9A700679420 /* OpenAIService.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -102,6 +104,8 @@
 		BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JournalViewController_MVVM.swift; sourceTree = SOURCE_ROOT; };
 		BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuidedEntryModels.swift; sourceTree = "<group>"; };
 		BE1501502E8B833700679420 /* LunarCalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LunarCalendarViewController.swift; sourceTree = "<group>"; };
+		BE1501522E8CB99B00679420 /* APIConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
+		BE1501542E8CB9A700679420 /* OpenAIService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -176,6 +180,8 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BE1501542E8CB9A700679420 /* OpenAIService.swift */,
+				BE1501522E8CB99B00679420 /* APIConfig.swift */,
 				BE1501502E8B833700679420 /* LunarCalendarViewController.swift */,
 				BE15014E2E83A59B00679420 /* GuidedEntryModels.swift */,
 				BE1501232E80C6F800679420 /* GuidedEntryViewController.swift */,
@@ -407,6 +413,7 @@
 				BE1501412E83931D00679420 /* TextEntryViewModel.swift in Sources */,
 				BE1501422E83931D00679420 /* ViewModelProtocol.swift in Sources */,
 				BE6EBB982E355B65004F4D5A /* HomeViewController.swift in Sources */,
+				BE1501532E8CB99B00679420 /* APIConfig.swift in Sources */,
 				BE1501402E83931D00679420 /* GuidedEntryViewModel.swift in Sources */,
 				BE15014C2E83933B00679420 /* TextEntryViewController_MVVM.swift in Sources */,
 				BE6EBB922E354949004F4D5A /* ChatMessageCell.swift in Sources */,
@@ -435,6 +442,7 @@
 				BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */,
 				BE1501452E83931D00679420 /* JournalViewModel.swift in Sources */,
 				BE1501242E80C6F800679420 /* GuidedEntryViewController.swift in Sources */,
+				BE1501552E8CB9A700679420 /* OpenAIService.swift in Sources */,
 				BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */,
 				BE1501162E7F59B100679420 /* PersonalityQuestionsViewController.swift in Sources */,
 			);

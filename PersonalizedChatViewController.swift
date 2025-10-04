@@ -42,6 +42,7 @@ class PersonalizedChatViewController: UIViewController {
     // Data
     private var personalityType: String?
     private var messages: [ChatMessage] = []
+    private var typingIndicatorView: UIView?
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -810,9 +811,24 @@ class PersonalizedChatViewController: UIViewController {
         textInputView.text = ""
         updatePlaceholderVisibility()
 
-        // Simulate Iris response (in a real app, this would call an AI service)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.addIrisResponse(to: messageText)
+        // Show typing indicator
+        showTypingIndicator()
+
+        // Send message to ChatGPT
+        OpenAIService.shared.sendMessage(messageText) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.hideTypingIndicator()
+
+                switch result {
+                case .success(let response):
+                    self?.addTypingMessage(text: response, isFromIris: true)
+                case .failure(let error):
+                    // Handle error gracefully
+                    let errorMessage = "I'm having trouble connecting right now. Please check your internet connection or try again later."
+                    self?.addTypingMessage(text: errorMessage, isFromIris: true)
+                    print("OpenAI Error: \(error.localizedDescription)")
+                }
+            }
         }
     }
 
@@ -826,11 +842,125 @@ class PersonalizedChatViewController: UIViewController {
         }
     }
 
+    private func addTypingMessage(text: String, isFromIris: Bool) {
+        // Create the message bubble with empty text first
+        let messageBubble = createMessageBubble(text: "", isFromIris: isFromIris)
+        messagesStackView.addArrangedSubview(messageBubble)
+
+        // Find the label inside the message bubble to animate
+        if let messageLabel = findMessageLabel(in: messageBubble) {
+            // Animate typing effect
+            typeText(text, into: messageLabel)
+        } else {
+            // Fallback to instant display if label not found
+            if let messageLabel = findMessageLabel(in: messageBubble) {
+                messageLabel.text = text
+            }
+        }
+
+        scrollToBottom()
+    }
+
+    private func findMessageLabel(in view: UIView) -> UILabel? {
+        if let label = view as? UILabel {
+            return label
+        }
+
+        for subview in view.subviews {
+            if let label = findMessageLabel(in: subview) {
+                return label
+            }
+        }
+
+        return nil
+    }
+
+    private func typeText(_ fullText: String, into label: UILabel) {
+        label.text = ""
+        let characters = Array(fullText)
+        var currentIndex = 0
+
+        // Calculate typing speed - faster for longer messages
+        let baseDelay = 0.05 // Base delay between characters (slower)
+        let adjustedDelay = max(0.02, baseDelay - (Double(characters.count) / 2000.0))
+
+        Timer.scheduledTimer(withTimeInterval: adjustedDelay, repeats: true) { timer in
+            if currentIndex < characters.count {
+                label.text! += String(characters[currentIndex])
+                currentIndex += 1
+
+                // Scroll to bottom as text appears
+                DispatchQueue.main.async {
+                    self.scrollToBottom()
+                }
+            } else {
+                timer.invalidate()
+            }
+        }
+    }
+
     private func scrollToBottom() {
         DispatchQueue.main.async {
             let bottomOffset = CGPoint(x: 0, y: max(0, self.scrollView.contentSize.height - self.scrollView.bounds.height))
             self.scrollView.setContentOffset(bottomOffset, animated: true)
         }
+    }
+
+    private func showTypingIndicator() {
+        guard typingIndicatorView == nil else { return }
+
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Create Iris message bubble style for typing indicator
+        let bubbleView = UIView()
+        bubbleView.translatesAutoresizingMaskIntoConstraints = false
+        bubbleView.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        bubbleView.layer.cornerRadius = 16
+        bubbleView.layer.cornerCurve = .continuous
+
+        // Add dots animation
+        let dotsLabel = UILabel()
+        dotsLabel.translatesAutoresizingMaskIntoConstraints = false
+        dotsLabel.text = "●●●"
+        dotsLabel.font = UIFont.systemFont(ofSize: 16)
+        dotsLabel.textColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        dotsLabel.textAlignment = .center
+        bubbleView.addSubview(dotsLabel)
+
+        containerView.addSubview(bubbleView)
+
+        NSLayoutConstraint.activate([
+            bubbleView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 60),
+            bubbleView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            bubbleView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            bubbleView.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -60),
+
+            dotsLabel.topAnchor.constraint(equalTo: bubbleView.topAnchor, constant: 12),
+            dotsLabel.leadingAnchor.constraint(equalTo: bubbleView.leadingAnchor, constant: 12),
+            dotsLabel.trailingAnchor.constraint(equalTo: bubbleView.trailingAnchor, constant: -12),
+            dotsLabel.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: -12),
+
+            containerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 40)
+        ])
+
+        // Simple animation for dots
+        UIView.animate(withDuration: 0.5, delay: 0, options: [.repeat, .autoreverse], animations: {
+            dotsLabel.alpha = 0.3
+        }, completion: nil)
+
+        typingIndicatorView = containerView
+        messagesStackView.addArrangedSubview(containerView)
+        scrollToBottom()
+    }
+
+    private func hideTypingIndicator() {
+        guard let indicator = typingIndicatorView else { return }
+
+        indicator.layer.removeAllAnimations()
+        messagesStackView.removeArrangedSubview(indicator)
+        indicator.removeFromSuperview()
+        typingIndicatorView = nil
     }
 
     private func addIrisResponse(to userMessage: String) {
