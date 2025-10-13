@@ -37,6 +37,8 @@
 		BE15015B2E91BB0D00679420 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501572E91BB0C00679420 /* VoiceService.swift */; };
 		BE15015C2E91BB0D00679420 /* VoiceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501582E91BB0D00679420 /* VoiceButton.swift */; };
 		BE15015D2E91BB0D00679420 /* AudioMessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */; };
+		BE1501602E91CAF300679420 /* ConversationOrb.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15015E2E91CAF300679420 /* ConversationOrb.swift */; };
+		BE1501612E91CAF300679420 /* VoiceConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE15015F2E91CAF300679420 /* VoiceConversationViewController.swift */; };
 		BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB832E32F882004F4D5A /* ChatViewController.swift */; };
 		BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */; };
 		BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */; };
@@ -59,6 +61,8 @@
 		BE9339EF2E2FEF8100D1C95C /* irisOneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */; };
 		BE9339F12E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */; };
 		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
+		BEAC5EB82E9DAA300032B770 /* iris_quick_starters.json in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */; };
+		BEAC5EBB2E9DAB710032B770 /* QuickStarterModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */; };
 		BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */; };
 		BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */; };
 		BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105292E411CBA00235A60 /* SettingsViewController.swift */; };
@@ -114,6 +118,8 @@
 		BE1501572E91BB0C00679420 /* VoiceService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
 		BE1501582E91BB0D00679420 /* VoiceButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceButton.swift; sourceTree = "<group>"; };
 		BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioMessageBubble.swift; sourceTree = "<group>"; };
+		BE15015E2E91CAF300679420 /* ConversationOrb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationOrb.swift; sourceTree = "<group>"; };
+		BE15015F2E91CAF300679420 /* VoiceConversationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceConversationViewController.swift; sourceTree = "<group>"; };
 		BE6EBB832E32F882004F4D5A /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		BE6EBB852E330270004F4D5A /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
 		BE6EBB892E33D435004F4D5A /* MoodTrackingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackingViewController.swift; sourceTree = "<group>"; };
@@ -140,6 +146,8 @@
 		BE9339EE2E2FEF8100D1C95C /* irisOneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITests.swift; sourceTree = "<group>"; };
 		BE9339F02E2FEF8100D1C95C /* irisOneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = irisOneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
+		BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = iris_quick_starters.json; sourceTree = "<group>"; };
+		BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickStarterModels.swift; sourceTree = "<group>"; };
 		BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "sleep music.mp3"; sourceTree = "<group>"; };
 		BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailViewController.swift; sourceTree = "<group>"; };
 		BED105292E411CBA00235A60 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -188,6 +196,9 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */,
+				BE15015E2E91CAF300679420 /* ConversationOrb.swift */,
+				BE15015F2E91CAF300679420 /* VoiceConversationViewController.swift */,
 				BE1501592E91BB0D00679420 /* AudioMessageBubble.swift */,
 				BE1501562E91BB0C00679420 /* VOICE_SETUP_INSTRUCTIONS.md */,
 				BE1501582E91BB0D00679420 /* VoiceButton.swift */,
@@ -245,6 +256,7 @@
 		BE9339CC2E2FEF7D00D1C95C /* irisOne */ = {
 			isa = PBXGroup;
 			children = (
+				BEAC5EB92E9DAB710032B770 /* models */,
 				BE1501462E83933A00679420 /* GuidedEntryViewController_MVVM.swift */,
 				BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */,
 				BE1501482E83933B00679420 /* TextEntryViewController_MVVM.swift */,
@@ -278,6 +290,14 @@
 			);
 			path = irisOneUITests;
 			sourceTree = "<group>";
+		};
+		BEAC5EB92E9DAB710032B770 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */,
+			);
+			path = models;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -387,6 +407,7 @@
 				BE9339DA2E2FEF8000D1C95C /* LaunchScreen.storyboard in Resources */,
 				BE15015A2E91BB0D00679420 /* VOICE_SETUP_INSTRUCTIONS.md in Resources */,
 				BE9339D72E2FEF8000D1C95C /* Assets.xcassets in Resources */,
+				BEAC5EB82E9DAA300032B770 /* iris_quick_starters.json in Resources */,
 				BE9339D52E2FEF7D00D1C95C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -421,6 +442,7 @@
 				BE9339D22E2FEF7D00D1C95C /* ViewController.swift in Sources */,
 				BE6EBB8A2E33D436004F4D5A /* MoodTrackingViewController.swift in Sources */,
 				BE15011A2E7FE1FD00679420 /* ProfileViewController.swift in Sources */,
+				BEAC5EBB2E9DAB710032B770 /* QuickStarterModels.swift in Sources */,
 				BE1501182E7F8C3C00679420 /* PersonalizedChatViewController.swift in Sources */,
 				BE6EBB902E354923004F4D5A /* ChatCategoryData.swift in Sources */,
 				BE1501412E83931D00679420 /* TextEntryViewModel.swift in Sources */,
@@ -436,6 +458,8 @@
 				BE15010E2E7F403800679420 /* LoginViewController.swift in Sources */,
 				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
 				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
+				BE1501602E91CAF300679420 /* ConversationOrb.swift in Sources */,
+				BE1501612E91CAF300679420 /* VoiceConversationViewController.swift in Sources */,
 				BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
 				BE15011E2E80A70600679420 /* EntryMethodModalViewController.swift in Sources */,

@@ -204,7 +204,11 @@ class AudioMessageBubble: UIView {
 
             // Generate pseudo-random heights based on duration and index for consistent waveform
             let seed = duration + Double(i)
-            let height = 3 + (sin(seed) * sin(seed * 1.5) * sin(seed * 2.3)) * (maxHeight - 3)
+            let sin1 = sin(seed)
+            let sin2 = sin(seed * 1.5)
+            let sin3 = sin(seed * 2.3)
+            let amplitude = sin1 * sin2 * sin3
+            let height: CGFloat = 3 + CGFloat(amplitude) * (maxHeight - 3)
 
             let x = CGFloat(i) * (barWidth + barSpacing)
             let y = (24 - abs(height)) / 2

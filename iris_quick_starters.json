@@ -1,0 +1,127 @@
+{
+  "version": "1.0",
+  "generated_at": "2025-10-13T21:27:31.812160Z",
+  "type": "quick_starters",
+  "items": [
+    {
+      "id": "i-want-to-plan-my-career-goals",
+      "title": "I want to plan my career goals",
+      "subtitle": "Let’s map out your professional journey",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-m-facing-a-difficult-decision",
+      "title": "I'm facing a difficult decision",
+      "subtitle": "We can work through it together",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-need-help-staying-motivated",
+      "title": "I need help staying motivated",
+      "subtitle": "Let’s find what drives you",
+      "category": "quick_starter"
+    },
+    {
+      "id": "help-me-create-a-morning-routine",
+      "title": "Help me create a morning routine",
+      "subtitle": "Build a simple plan to start strong",
+      "category": "quick_starter"
+    },
+    {
+      "id": "guide-me-through-a-5-minute-reflection",
+      "title": "Guide me through a 5-minute reflection",
+      "subtitle": "Pause, breathe, and check in",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-want-to-reduce-stress-today",
+      "title": "I want to reduce stress today",
+      "subtitle": "Quick tools to calm your mind",
+      "category": "quick_starter"
+    },
+    {
+      "id": "help-me-set-weekly-priorities",
+      "title": "Help me set weekly priorities",
+      "subtitle": "Pick the big three for the week",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-m-feeling-overwhelmed",
+      "title": "I’m feeling overwhelmed",
+      "subtitle": "Break things into small, doable steps",
+      "category": "quick_starter"
+    },
+    {
+      "id": "turn-my-ideas-into-a-plan",
+      "title": "Turn my ideas into a plan",
+      "subtitle": "Outline goals, milestones, and next actions",
+      "category": "quick_starter"
+    },
+    {
+      "id": "coach-me-on-better-habits",
+      "title": "Coach me on better habits",
+      "subtitle": "Tiny changes with big impact",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-need-feedback-on-a-message",
+      "title": "I need feedback on a message",
+      "subtitle": "Draft or refine a text/email",
+      "category": "quick_starter"
+    },
+    {
+      "id": "prepare-me-for-an-interview",
+      "title": "Prepare me for an interview",
+      "subtitle": "Practice questions and talking points",
+      "category": "quick_starter"
+    },
+    {
+      "id": "help-me-budget-smarter",
+      "title": "Help me budget smarter",
+      "subtitle": "Track spending and set targets",
+      "category": "quick_starter"
+    },
+    {
+      "id": "improve-my-focus",
+      "title": "Improve my focus",
+      "subtitle": "Create a distraction-free session now",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-want-to-build-confidence",
+      "title": "I want to build confidence",
+      "subtitle": "Reframe self-talk and celebrate wins",
+      "category": "quick_starter"
+    },
+    {
+      "id": "strengthen-a-relationship",
+      "title": "Strengthen a relationship",
+      "subtitle": "Empathy prompts and conversation ideas",
+      "category": "quick_starter"
+    },
+    {
+      "id": "help-me-plan-a-study-session",
+      "title": "Help me plan a study session",
+      "subtitle": "Set a goal, timer, and review steps",
+      "category": "quick_starter"
+    },
+    {
+      "id": "i-want-to-sleep-better",
+      "title": "I want to sleep better",
+      "subtitle": "Wind-down checklist and sleep tips",
+      "category": "quick_starter"
+    },
+    {
+      "id": "plan-my-fitness-week",
+      "title": "Plan my fitness week",
+      "subtitle": "Simple schedule matched to your energy",
+      "category": "quick_starter"
+    },
+    {
+      "id": "check-in-on-my-mood",
+      "title": "Check in on my mood",
+      "subtitle": "Name it, understand it, and respond kindly",
+      "category": "quick_starter"
+    }
+  ]
+}

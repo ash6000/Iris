@@ -25,10 +25,15 @@ class VoiceService: NSObject {
     private var recordingTimer: Timer?
     private var recordingStartTime: Date?
 
+    // Single recorder for both VAD and recording
+    private var isVADActive = false
+    private var isActuallyRecording = false
+
     private var recordingURL: URL {
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return documentsPath.appendingPathComponent("voice_recording.m4a")
     }
+
 
     // MARK: - Audio Session Setup
     private override init() {
@@ -69,10 +74,26 @@ class VoiceService: NSObject {
         // Stop any current playback
         stopPlayback()
 
+        // If no recorder is running (VAD not active), start one
+        if audioRecorder == nil {
+            startContinuousRecorder()
+        }
+
+        // Mark as actually recording and start tracking time
+        isActuallyRecording = true
+        recordingStartTime = Date()
+        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.updateRecordingTime()
+        }
+
+        delegate?.voiceServiceDidStartRecording()
+    }
+
+    private func startContinuousRecorder() {
         // Remove existing recording
         try? FileManager.default.removeItem(at: recordingURL)
 
-        // Configure audio recorder
+        // Configure audio recorder for continuous operation
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 44100.0,
@@ -85,25 +106,20 @@ class VoiceService: NSObject {
             audioRecorder?.delegate = self
             audioRecorder?.isMeteringEnabled = true
             audioRecorder?.record()
-
-            // Start recording timer
-            recordingStartTime = Date()
-            recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-                self?.updateRecordingTime()
-            }
-
-            delegate?.voiceServiceDidStartRecording()
-
         } catch {
             delegate?.voiceServiceDidFailWithError(error)
         }
     }
 
     func stopRecording() {
-        audioRecorder?.stop()
         recordingTimer?.invalidate()
         recordingTimer = nil
         recordingStartTime = nil
+        isActuallyRecording = false
+
+        // Stop the recorder which will trigger audioRecorderDidFinishRecording
+        audioRecorder?.stop()
+        audioRecorder = nil
 
         delegate?.voiceServiceDidStopRecording()
     }
@@ -113,10 +129,7 @@ class VoiceService: NSObject {
         let recordingTime = Date().timeIntervalSince(startTime)
         delegate?.voiceServiceRecordingTimeDidUpdate(recordingTime)
 
-        // Auto-stop after 60 seconds to prevent too long recordings
-        if recordingTime >= 60.0 {
-            stopRecording()
-        }
+        // No time limit - let user talk as long as they want
     }
 
     func getRecordingData() -> Data? {
@@ -150,15 +163,52 @@ class VoiceService: NSObject {
     }
 
     func isRecording() -> Bool {
-        return audioRecorder?.isRecording ?? false
+        return isActuallyRecording && (audioRecorder?.isRecording ?? false)
     }
 
     // MARK: - Audio Level Monitoring
     func getAudioLevel() -> Float {
+        // Use single recorder for both VAD and recording
         guard let recorder = audioRecorder, recorder.isRecording else { return 0.0 }
         recorder.updateMeters()
         let normalizedLevel = pow(10.0, recorder.averagePower(forChannel: 0) / 20.0)
         return normalizedLevel
+    }
+
+    // MARK: - Voice Activity Detection
+    func startVoiceActivityDetection() {
+        guard hasMicrophonePermission() else {
+            delegate?.voiceServiceDidFailWithError(VoiceServiceError.microphonePermissionDenied)
+            return
+        }
+
+        guard !isVADActive else { return }
+
+        // Start continuous recorder if not already running
+        if audioRecorder == nil {
+            startContinuousRecorder()
+        }
+
+        isVADActive = true
+    }
+
+    func stopVoiceActivityDetection() {
+        isVADActive = false
+
+        // Only stop recorder if not actually recording
+        if !isActuallyRecording {
+            audioRecorder?.stop()
+            audioRecorder = nil
+        }
+    }
+
+    func isVADRunning() -> Bool {
+        return isVADActive && (audioRecorder?.isRecording ?? false)
+    }
+
+    // Enhanced audio level for VAD
+    func getCurrentAudioLevel() -> Float {
+        return getAudioLevel()
     }
 }
 
@@ -167,6 +217,13 @@ extension VoiceService: AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         let audioData = flag ? getRecordingData() : nil
         delegate?.voiceServiceDidFinishRecording(audioData: audioData, success: flag)
+
+        // Restart recorder for VAD if still active and not actually recording
+        if isVADActive && !isActuallyRecording {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.startContinuousRecorder()
+            }
+        }
     }
 
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
