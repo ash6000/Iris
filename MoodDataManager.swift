@@ -92,7 +92,7 @@ class MoodDataManager {
     private let voiceRecordingsKey = "VoiceRecordings"
     
     // MARK: - Helper Methods
-    private func saveMoodEntries(_ entries: [PersistentMoodEntry]) {
+    internal func saveMoodEntries(_ entries: [PersistentMoodEntry]) {
         do {
             let data = try JSONEncoder().encode(entries)
             userDefaults.set(data, forKey: moodEntriesKey)
@@ -101,8 +101,8 @@ class MoodDataManager {
             print("❌ Failed to save mood data: \(error)")
         }
     }
-    
-    private func loadMoodEntries() -> [PersistentMoodEntry] {
+
+    internal func loadMoodEntries() -> [PersistentMoodEntry] {
         guard let data = userDefaults.data(forKey: moodEntriesKey),
               let entries = try? JSONDecoder().decode([PersistentMoodEntry].self, from: data) else {
             return []

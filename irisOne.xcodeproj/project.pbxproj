@@ -63,6 +63,26 @@
 		BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */; };
 		BEAC5EB82E9DAA300032B770 /* iris_quick_starters.json in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */; };
 		BEAC5EBB2E9DAB710032B770 /* QuickStarterModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */; };
+		BEAC5EBD2E9DD4AD0032B770 /* VoiceConversationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EBC2E9DD4AD0032B770 /* VoiceConversationManager.swift */; };
+		BEAC5EBF2E9DD4BC0032B770 /* VOICE_CONVERSATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5EBE2E9DD4BC0032B770 /* VOICE_CONVERSATION_GUIDE.md */; };
+		BEAC5EC22EA5924F0032B770 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = BEAC5EC12EA5924F0032B770 /* Auth */; };
+		BEAC5EC42EA5924F0032B770 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = BEAC5EC32EA5924F0032B770 /* PostgREST */; };
+		BEAC5EC62EA5924F0032B770 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = BEAC5EC52EA5924F0032B770 /* Storage */; };
+		BEAC5EC82EA5924F0032B770 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BEAC5EC72EA5924F0032B770 /* Supabase */; };
+		BEAC5ECC2EA596730032B770 /* SupabaseHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5ECA2EA596730032B770 /* SupabaseHelpers.swift */; };
+		BEAC5ECD2EA596730032B770 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5ECB2EA596730032B770 /* SupabaseManager.swift */; };
+		BEAC5ED62EA596920032B770 /* 01_core_schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ECF2EA596920032B770 /* 01_core_schema.sql */; };
+		BEAC5ED72EA596920032B770 /* SUPABASE_SETUP_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED02EA596920032B770 /* SUPABASE_SETUP_GUIDE.md */; };
+		BEAC5ED82EA596920032B770 /* 02_conversations_schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED12EA596920032B770 /* 02_conversations_schema.sql */; };
+		BEAC5ED92EA596920032B770 /* 05_ambassador_schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED22EA596920032B770 /* 05_ambassador_schema.sql */; };
+		BEAC5EDA2EA596920032B770 /* 03_content_schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED32EA596920032B770 /* 03_content_schema.sql */; };
+		BEAC5EDB2EA596920032B770 /* DATABASE_IMPLEMENTATION_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED42EA596920032B770 /* DATABASE_IMPLEMENTATION_SUMMARY.md */; };
+		BEAC5EDC2EA596920032B770 /* 04_tracking_schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = BEAC5ED52EA596920032B770 /* 04_tracking_schema.sql */; };
+		BEAC5EDE2EA59A340032B770 /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EDD2EA59A340032B770 /* SupabaseConfig.swift */; };
+		BEAC5EE02EA59BAC0032B770 /* DatabaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EDF2EA59BAC0032B770 /* DatabaseModels.swift */; };
+		BEAC5EE22EA59FCE0032B770 /* ModelConverters.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EE12EA59FCE0032B770 /* ModelConverters.swift */; };
+		BEAC5EE42EA59FEF0032B770 /* MoodDataManager+CloudSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EE32EA59FEF0032B770 /* MoodDataManager+CloudSync.swift */; };
+		BEAC5EE62EA5A0300032B770 /* CloudSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC5EE52EA5A0300032B770 /* CloudSyncManager.swift */; };
 		BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */; };
 		BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */; };
 		BED1052A2E411CBA00235A60 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED105292E411CBA00235A60 /* SettingsViewController.swift */; };
@@ -148,6 +168,22 @@
 		BE9339FD2E2FEFA500D1C95C /* IrisWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisWelcomeViewController.swift; sourceTree = "<group>"; };
 		BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = iris_quick_starters.json; sourceTree = "<group>"; };
 		BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickStarterModels.swift; sourceTree = "<group>"; };
+		BEAC5EBC2E9DD4AD0032B770 /* VoiceConversationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceConversationManager.swift; sourceTree = "<group>"; };
+		BEAC5EBE2E9DD4BC0032B770 /* VOICE_CONVERSATION_GUIDE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = VOICE_CONVERSATION_GUIDE.md; sourceTree = "<group>"; };
+		BEAC5ECA2EA596730032B770 /* SupabaseHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupabaseHelpers.swift; sourceTree = "<group>"; };
+		BEAC5ECB2EA596730032B770 /* SupabaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
+		BEAC5ECF2EA596920032B770 /* 01_core_schema.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 01_core_schema.sql; sourceTree = "<group>"; };
+		BEAC5ED02EA596920032B770 /* SUPABASE_SETUP_GUIDE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = SUPABASE_SETUP_GUIDE.md; sourceTree = "<group>"; };
+		BEAC5ED12EA596920032B770 /* 02_conversations_schema.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 02_conversations_schema.sql; sourceTree = "<group>"; };
+		BEAC5ED22EA596920032B770 /* 05_ambassador_schema.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 05_ambassador_schema.sql; sourceTree = "<group>"; };
+		BEAC5ED32EA596920032B770 /* 03_content_schema.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 03_content_schema.sql; sourceTree = "<group>"; };
+		BEAC5ED42EA596920032B770 /* DATABASE_IMPLEMENTATION_SUMMARY.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DATABASE_IMPLEMENTATION_SUMMARY.md; sourceTree = "<group>"; };
+		BEAC5ED52EA596920032B770 /* 04_tracking_schema.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 04_tracking_schema.sql; sourceTree = "<group>"; };
+		BEAC5EDD2EA59A340032B770 /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SupabaseConfig.swift; path = ../SupabaseConfig.swift; sourceTree = "<group>"; };
+		BEAC5EDF2EA59BAC0032B770 /* DatabaseModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseModels.swift; sourceTree = "<group>"; };
+		BEAC5EE12EA59FCE0032B770 /* ModelConverters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelConverters.swift; sourceTree = "<group>"; };
+		BEAC5EE32EA59FEF0032B770 /* MoodDataManager+CloudSync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "MoodDataManager+CloudSync.swift"; path = "managers/MoodDataManager+CloudSync.swift"; sourceTree = SOURCE_ROOT; };
+		BEAC5EE52EA5A0300032B770 /* CloudSyncManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudSyncManager.swift; sourceTree = "<group>"; };
 		BEB3202B2E4986B9007AC3C3 /* sleep music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "sleep music.mp3"; sourceTree = "<group>"; };
 		BED105272E41185D00235A60 /* MoodEntryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailViewController.swift; sourceTree = "<group>"; };
 		BED105292E411CBA00235A60 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -160,6 +196,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEAC5EC82EA5924F0032B770 /* Supabase in Frameworks */,
+				BEAC5EC62EA5924F0032B770 /* Storage in Frameworks */,
+				BEAC5EC42EA5924F0032B770 /* PostgREST in Frameworks */,
+				BEAC5EC22EA5924F0032B770 /* Auth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +236,8 @@
 		BE9339C12E2FEF7D00D1C95C = {
 			isa = PBXGroup;
 			children = (
+				BEAC5EBE2E9DD4BC0032B770 /* VOICE_CONVERSATION_GUIDE.md */,
+				BEAC5EBC2E9DD4AD0032B770 /* VoiceConversationManager.swift */,
 				BEAC5EB72E9DAA300032B770 /* iris_quick_starters.json */,
 				BE15015E2E91CAF300679420 /* ConversationOrb.swift */,
 				BE15015F2E91CAF300679420 /* VoiceConversationViewController.swift */,
@@ -256,6 +298,8 @@
 		BE9339CC2E2FEF7D00D1C95C /* irisOne */ = {
 			isa = PBXGroup;
 			children = (
+				BEAC5ECE2EA596920032B770 /* database */,
+				BEAC5EC92EA596730032B770 /* managers */,
 				BEAC5EB92E9DAB710032B770 /* models */,
 				BE1501462E83933A00679420 /* GuidedEntryViewController_MVVM.swift */,
 				BE1501492E83933B00679420 /* JournalViewController_MVVM.swift */,
@@ -294,9 +338,37 @@
 		BEAC5EB92E9DAB710032B770 /* models */ = {
 			isa = PBXGroup;
 			children = (
+				BEAC5EE12EA59FCE0032B770 /* ModelConverters.swift */,
+				BEAC5EDF2EA59BAC0032B770 /* DatabaseModels.swift */,
 				BEAC5EBA2E9DAB710032B770 /* QuickStarterModels.swift */,
 			);
 			path = models;
+			sourceTree = SOURCE_ROOT;
+		};
+		BEAC5EC92EA596730032B770 /* managers */ = {
+			isa = PBXGroup;
+			children = (
+				BEAC5EDD2EA59A340032B770 /* SupabaseConfig.swift */,
+				BEAC5EE52EA5A0300032B770 /* CloudSyncManager.swift */,
+				BEAC5EE32EA59FEF0032B770 /* MoodDataManager+CloudSync.swift */,
+				BEAC5ECA2EA596730032B770 /* SupabaseHelpers.swift */,
+				BEAC5ECB2EA596730032B770 /* SupabaseManager.swift */,
+			);
+			path = managers;
+			sourceTree = SOURCE_ROOT;
+		};
+		BEAC5ECE2EA596920032B770 /* database */ = {
+			isa = PBXGroup;
+			children = (
+				BEAC5ECF2EA596920032B770 /* 01_core_schema.sql */,
+				BEAC5ED02EA596920032B770 /* SUPABASE_SETUP_GUIDE.md */,
+				BEAC5ED12EA596920032B770 /* 02_conversations_schema.sql */,
+				BEAC5ED22EA596920032B770 /* 05_ambassador_schema.sql */,
+				BEAC5ED32EA596920032B770 /* 03_content_schema.sql */,
+				BEAC5ED42EA596920032B770 /* DATABASE_IMPLEMENTATION_SUMMARY.md */,
+				BEAC5ED52EA596920032B770 /* 04_tracking_schema.sql */,
+			);
+			path = database;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
@@ -315,6 +387,12 @@
 			dependencies = (
 			);
 			name = irisOne;
+			packageProductDependencies = (
+				BEAC5EC12EA5924F0032B770 /* Auth */,
+				BEAC5EC32EA5924F0032B770 /* PostgREST */,
+				BEAC5EC52EA5924F0032B770 /* Storage */,
+				BEAC5EC72EA5924F0032B770 /* Supabase */,
+			);
 			productName = irisOne;
 			productReference = BE9339CA2E2FEF7D00D1C95C /* irisOne.app */;
 			productType = "com.apple.product-type.application";
@@ -387,6 +465,9 @@
 				Base,
 			);
 			mainGroup = BE9339C12E2FEF7D00D1C95C;
+			packageReferences = (
+				BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			productRefGroup = BE9339CB2E2FEF7D00D1C95C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -404,8 +485,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEB3202C2E4986BA007AC3C3 /* sleep music.mp3 in Resources */,
+				BEAC5ED62EA596920032B770 /* 01_core_schema.sql in Resources */,
+				BEAC5EDC2EA596920032B770 /* 04_tracking_schema.sql in Resources */,
+				BEAC5EDB2EA596920032B770 /* DATABASE_IMPLEMENTATION_SUMMARY.md in Resources */,
 				BE9339DA2E2FEF8000D1C95C /* LaunchScreen.storyboard in Resources */,
 				BE15015A2E91BB0D00679420 /* VOICE_SETUP_INSTRUCTIONS.md in Resources */,
+				BEAC5EBF2E9DD4BC0032B770 /* VOICE_CONVERSATION_GUIDE.md in Resources */,
+				BEAC5ED92EA596920032B770 /* 05_ambassador_schema.sql in Resources */,
+				BEAC5ED72EA596920032B770 /* SUPABASE_SETUP_GUIDE.md in Resources */,
+				BEAC5ED82EA596920032B770 /* 02_conversations_schema.sql in Resources */,
+				BEAC5EDA2EA596920032B770 /* 03_content_schema.sql in Resources */,
 				BE9339D72E2FEF8000D1C95C /* Assets.xcassets in Resources */,
 				BEAC5EB82E9DAA300032B770 /* iris_quick_starters.json in Resources */,
 				BE9339D52E2FEF7D00D1C95C /* Main.storyboard in Resources */,
@@ -436,6 +525,8 @@
 				BE6EBBB62E3D13E0004F4D5A /* MoodOverviewViewController.swift in Sources */,
 				BE9339FE2E2FEFA500D1C95C /* IrisWelcomeViewController.swift in Sources */,
 				BED105282E41185D00235A60 /* MoodEntryDetailViewController.swift in Sources */,
+				BEAC5EE02EA59BAC0032B770 /* DatabaseModels.swift in Sources */,
+				BEAC5ECC2EA596730032B770 /* SupabaseHelpers.swift in Sources */,
 				BE6EBB862E330270004F4D5A /* CustomTabBarController.swift in Sources */,
 				BE1501202E80AE7B00679420 /* VoiceEntryViewController.swift in Sources */,
 				BE1501432E83931D00679420 /* BaseViewModel.swift in Sources */,
@@ -453,17 +544,21 @@
 				BE15014C2E83933B00679420 /* TextEntryViewController_MVVM.swift in Sources */,
 				BE6EBB922E354949004F4D5A /* ChatMessageCell.swift in Sources */,
 				BE1501122E7F4B9B00679420 /* WelcomeViewController.swift in Sources */,
+				BEAC5EE22EA59FCE0032B770 /* ModelConverters.swift in Sources */,
 				BE1501102E7F430D00679420 /* EmailVerifyViewController.swift in Sources */,
 				BE6EBB8C2E33E7BA004F4D5A /* RelaxViewController.swift in Sources */,
 				BE15010E2E7F403800679420 /* LoginViewController.swift in Sources */,
 				BE6EBB942E354976004F4D5A /* TypingIndicatorCell.swift in Sources */,
+				BEAC5EDE2EA59A340032B770 /* SupabaseConfig.swift in Sources */,
 				BE6EBB842E32F882004F4D5A /* ChatViewController.swift in Sources */,
 				BE1501602E91CAF300679420 /* ConversationOrb.swift in Sources */,
 				BE1501612E91CAF300679420 /* VoiceConversationViewController.swift in Sources */,
 				BE15014F2E83A59C00679420 /* GuidedEntryModels.swift in Sources */,
 				BE9339CE2E2FEF7D00D1C95C /* AppDelegate.swift in Sources */,
+				BEAC5ECD2EA596730032B770 /* SupabaseManager.swift in Sources */,
 				BE15011E2E80A70600679420 /* EntryMethodModalViewController.swift in Sources */,
 				BE1501442E83931D00679420 /* VoiceEntryViewModel.swift in Sources */,
+				BEAC5EE62EA5A0300032B770 /* CloudSyncManager.swift in Sources */,
 				BE15014A2E83933B00679420 /* GuidedEntryViewController_MVVM.swift in Sources */,
 				BE15014B2E83933B00679420 /* VoiceEntryViewController_MVVM.swift in Sources */,
 				BE1501222E80B2E900679420 /* TextEntryViewController.swift in Sources */,
@@ -477,6 +572,8 @@
 				BE15015D2E91BB0D00679420 /* AudioMessageBubble.swift in Sources */,
 				BED105CE2E440D6F00235A60 /* VoiceRecordingManager.swift in Sources */,
 				BE1501512E8B833700679420 /* LunarCalendarViewController.swift in Sources */,
+				BEAC5EBD2E9DD4AD0032B770 /* VoiceConversationManager.swift in Sources */,
+				BEAC5EE42EA59FEF0032B770 /* MoodDataManager+CloudSync.swift in Sources */,
 				BE6EBB962E355B35004F4D5A /* CategoryCardView.swift in Sources */,
 				BED105CC2E440D4800235A60 /* MoodDataManager.swift in Sources */,
 				BE1501452E83931D00679420 /* JournalViewModel.swift in Sources */,
@@ -674,6 +771,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -702,6 +800,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -831,6 +930,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BEAC5EC12EA5924F0032B770 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		BEAC5EC32EA5924F0032B770 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		BEAC5EC52EA5924F0032B770 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		BEAC5EC72EA5924F0032B770 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BEAC5EC02EA5924F0032B770 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BE9339C22E2FEF7D00D1C95C /* Project object */;
 }

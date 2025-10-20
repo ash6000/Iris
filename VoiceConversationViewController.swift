@@ -1,13 +1,12 @@
+//
+//  VoiceConversationViewController.swift
+//  irisOne
+//
+//  Updated to use VoiceConversationManager for natural ChatGPT-like voice mode
+//
+
 import UIKit
 import AVFoundation
-
-enum VoiceConversationState {
-    case idle           // Waiting for user to speak
-    case listening      // User is speaking
-    case processing     // Transcribing and getting AI response
-    case speaking       // AI is speaking back
-    case paused         // Temporarily paused
-}
 
 protocol VoiceConversationDelegate: AnyObject {
     func voiceConversationDidFinish(messages: [(text: String, isFromUser: Bool)])
@@ -19,32 +18,7 @@ class VoiceConversationViewController: UIViewController {
     // MARK: - Properties
     weak var delegate: VoiceConversationDelegate?
 
-    private var currentState: VoiceConversationState = .idle {
-        didSet {
-            updateStateUI()
-        }
-    }
-
-    // Conversation data
-    private var conversationMessages: [(text: String, isFromUser: Bool)] = []
-    private var isFirstMessage = true
-
-    // Voice Activity Detection
-    private var vadTimer: Timer?
-    private var speechStartTime: Date?
-    private let minimumSpeechDuration: TimeInterval = 0.5
-
-    // Enhanced VAD for echo cancellation
-    private var voiceDetectionEnabled = true
-    private var recoveryTimer: Timer?
-    private let voiceDetectionThreshold: Float = 0.08 // Much lower threshold for natural speech
-    private var lastVoiceDetectionTime: Date?
-
-    // Complex 5-second silence detection
-    private var audioLevelHistory: [Float] = []
-    private let audioHistorySize = 15 // Longer history for better smoothing (1.5 seconds)
-    private var silenceStartTime: Date?
-    private let requiredSilenceDuration: TimeInterval = 5.0 // Fixed 5 seconds
+    private let voiceManager = VoiceConversationManager()
 
     // UI Components
     private let backgroundView = UIView()
@@ -53,28 +27,27 @@ class VoiceConversationViewController: UIViewController {
     private let conversationOrb = ConversationOrb()
     private let statusLabel = UILabel()
     private let instructionLabel = UILabel()
-    private let transcriptLabel = UILabel()
 
-    // Gesture recognition
-    private var longPressGesture: UILongPressGestureRecognizer?
+    // Transcript view
+    private let transcriptScrollView = UIScrollView()
+    private let transcriptStackView = UIStackView()
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        setupGestures()
-        setupAudio()
+        setupVoiceManager()
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        startVoiceConversation()
+        startConversation()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        stopVoiceConversation()
+        voiceManager.stopConversation()
     }
 
     // MARK: - Setup
@@ -105,10 +78,10 @@ class VoiceConversationViewController: UIViewController {
 
         // Status label
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
-        statusLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        statusLabel.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         statusLabel.textColor = UIColor.white
         statusLabel.textAlignment = .center
-        statusLabel.text = "Listening..."
+        statusLabel.text = "Ready to listen"
         contentView.addSubview(statusLabel)
 
         // Instruction label
@@ -117,17 +90,21 @@ class VoiceConversationViewController: UIViewController {
         instructionLabel.textColor = UIColor.white.withAlphaComponent(0.7)
         instructionLabel.textAlignment = .center
         instructionLabel.numberOfLines = 0
-        instructionLabel.text = "Start speaking naturally"
+        instructionLabel.text = "Just start speaking naturally"
         contentView.addSubview(instructionLabel)
 
-        // Transcript label (for real-time feedback)
-        transcriptLabel.translatesAutoresizingMaskIntoConstraints = false
-        transcriptLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        transcriptLabel.textColor = UIColor.white.withAlphaComponent(0.8)
-        transcriptLabel.textAlignment = .center
-        transcriptLabel.numberOfLines = 0
-        transcriptLabel.alpha = 0
-        contentView.addSubview(transcriptLabel)
+        // Transcript scroll view
+        transcriptScrollView.translatesAutoresizingMaskIntoConstraints = false
+        transcriptScrollView.showsVerticalScrollIndicator = false
+        transcriptScrollView.alpha = 0
+        contentView.addSubview(transcriptScrollView)
+
+        // Transcript stack view
+        transcriptStackView.translatesAutoresizingMaskIntoConstraints = false
+        transcriptStackView.axis = .vertical
+        transcriptStackView.spacing = 12
+        transcriptStackView.alignment = .fill
+        transcriptScrollView.addSubview(transcriptStackView)
     }
 
     private func setupConstraints() {
@@ -152,7 +129,7 @@ class VoiceConversationViewController: UIViewController {
 
             // Conversation orb (centered)
             conversationOrb.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            conversationOrb.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -40),
+            conversationOrb.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 60),
             conversationOrb.widthAnchor.constraint(equalToConstant: 200),
             conversationOrb.heightAnchor.constraint(equalToConstant: 200),
 
@@ -162,34 +139,42 @@ class VoiceConversationViewController: UIViewController {
             statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
             // Instruction label
-            instructionLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
+            instructionLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 8),
             instructionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             instructionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            // Transcript label
-            transcriptLabel.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor, constant: 24),
-            transcriptLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            transcriptLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            // Transcript scroll view
+            transcriptScrollView.topAnchor.constraint(equalTo: instructionLabel.bottomAnchor, constant: 24),
+            transcriptScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            transcriptScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            transcriptScrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
+
+            // Transcript stack view
+            transcriptStackView.topAnchor.constraint(equalTo: transcriptScrollView.topAnchor),
+            transcriptStackView.leadingAnchor.constraint(equalTo: transcriptScrollView.leadingAnchor),
+            transcriptStackView.trailingAnchor.constraint(equalTo: transcriptScrollView.trailingAnchor),
+            transcriptStackView.bottomAnchor.constraint(equalTo: transcriptScrollView.bottomAnchor),
+            transcriptStackView.widthAnchor.constraint(equalTo: transcriptScrollView.widthAnchor)
         ])
     }
 
-    private func setupGestures() {
-        // Add tap gesture to orb for manual trigger if needed
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(orbTapped))
-        conversationOrb.addGestureRecognizer(tapGesture)
+    private func setupVoiceManager() {
+        voiceManager.delegate = self
+
+        // Configure for natural conversation (you can tune these)
+        voiceManager.configuration.silenceThreshold = 1.5              // 1.5 seconds of silence
+        voiceManager.configuration.speechEnergyThreshold = -40.0       // dB threshold
+        voiceManager.configuration.minimumSpeechDuration = 0.5         // Minimum 0.5s speech
+        voiceManager.configuration.enableInterruption = true            // Allow interrupting AI
     }
 
-    private func setupAudio() {
-        VoiceService.shared.delegate = self
-    }
-
-    // MARK: - Voice Conversation Control
-    private func startVoiceConversation() {
-        // Request microphone permission first
-        VoiceService.shared.requestMicrophonePermission { [weak self] granted in
+    // MARK: - Conversation Control
+    private func startConversation() {
+        // Check microphone permission
+        AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
             DispatchQueue.main.async {
                 if granted {
-                    self?.beginListening()
+                    self?.voiceManager.startConversation()
                 } else {
                     self?.showPermissionError()
                 }
@@ -197,205 +182,19 @@ class VoiceConversationViewController: UIViewController {
         }
     }
 
-    private func stopVoiceConversation() {
-        vadTimer?.invalidate()
-        recoveryTimer?.invalidate()
-        VoiceService.shared.stopVoiceActivityDetection()
-        VoiceService.shared.stopRecording()
-        VoiceService.shared.stopPlayback()
-    }
-
-    private func beginListening() {
-        currentState = .idle
-        voiceDetectionEnabled = true // Ensure voice detection is enabled from start
-        audioLevelHistory.removeAll() // Clear audio history for fresh start
-        startVoiceActivityDetection()
-    }
-
-    // MARK: - Voice Activity Detection
-    private func startVoiceActivityDetection() {
-        // Start VoiceService VAD for continuous audio monitoring
-        VoiceService.shared.startVoiceActivityDetection()
-
-        // Start timer with moderate polling - not too sensitive
-        vadTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.checkVoiceActivity()
-        }
-    }
-
-    private func checkVoiceActivity() {
-        // Get raw audio level from VoiceService VAD
-        let rawAudioLevel = VoiceService.shared.getCurrentAudioLevel()
-
-        // Add to history and maintain rolling average for smoothing
-        audioLevelHistory.append(rawAudioLevel)
-        if audioLevelHistory.count > audioHistorySize {
-            audioLevelHistory.removeFirst()
-        }
-
-        // Use smoothed average to prevent false silence detection
-        let smoothedAudioLevel = audioLevelHistory.reduce(0, +) / Float(audioLevelHistory.count)
-
-        // Always update orb with raw level for immediate visual feedback
-        conversationOrb.updateAudioLevel(rawAudioLevel)
-
-        // Skip voice detection if disabled (during AI playback or recovery)
-        guard voiceDetectionEnabled else { return }
-
-        // Use smoothed level for voice detection to prevent false cutoffs
-        let isVoiceDetected = smoothedAudioLevel > voiceDetectionThreshold
-
-        // Handle voice detection based on current state
-        switch currentState {
-        case .idle:
-            if isVoiceDetected {
-                // Voice detected, start recording IMMEDIATELY
-                startListening()
-            }
-
-        case .listening:
-            if isVoiceDetected {
-                // Voice detected - reset silence tracking
-                lastVoiceDetectionTime = Date()
-                silenceStartTime = nil
-            } else {
-                // Check if we have enough recent silence samples before starting timer
-                let recentSilentSamples = audioLevelHistory.suffix(8).filter { $0 <= voiceDetectionThreshold }.count
-                if recentSilentSamples >= 6 { // Require 6 out of last 8 samples to be silent (0.6 seconds)
-                    checkForFiveSecondSilence()
-                } else {
-                    // Reset silence timer if not enough sustained silence
-                    silenceStartTime = nil
-                }
-            }
-
-        case .processing:
-            // During processing, ignore voice input
-            break
-
-        case .speaking:
-            // During AI speech, DISABLE interruption to prevent echo
-            break
-
-        case .paused:
-            // During pause, ignore voice input
-            break
-        }
-    }
-
-    private func startListening() {
-        guard currentState == .idle else { return }
-
-        currentState = .listening
-        speechStartTime = Date()
-        lastVoiceDetectionTime = Date()
-        audioLevelHistory.removeAll()
-        silenceStartTime = nil
-        VoiceService.shared.startRecording()
-    }
-
-    private func checkForFiveSecondSilence() {
-        let now = Date()
-
-        // Start tracking silence if not already
-        if silenceStartTime == nil {
-            silenceStartTime = now
-            return
-        }
-
-        // Check if we've had 5 seconds of silence
-        if let silenceStart = silenceStartTime {
-            let silenceDuration = now.timeIntervalSince(silenceStart)
-
-            if silenceDuration >= requiredSilenceDuration {
-                // 5 seconds of silence - process the speech
-                finishListening()
-            }
-        }
-    }
-
-    private func finishListening() {
-        silenceStartTime = nil
-        VoiceService.shared.stopRecording()
-        currentState = .processing
-    }
-
-
-    // MARK: - State Management
-    private func updateStateUI() {
-        DispatchQueue.main.async {
-            switch self.currentState {
-            case .idle:
-                self.setIdleState()
-            case .listening:
-                self.setListeningState()
-            case .processing:
-                self.setProcessingState()
-            case .speaking:
-                self.setSpeakingState()
-            case .paused:
-                self.setPausedState()
-            }
-        }
-    }
-
-    private func setIdleState() {
-        statusLabel.text = isFirstMessage ? "Start speaking" : "I'm listening..."
-        instructionLabel.text = isFirstMessage ? "I'll wait 5 seconds after you stop" : "Speak as long as you need - 5 sec pause to process"
-        conversationOrb.setState(.idle)
-        hideTranscript()
-    }
-
-    private func setListeningState() {
-        statusLabel.text = "Listening..."
-        instructionLabel.text = "Pause for 5 seconds when you're done"
-        conversationOrb.setState(.listening)
-        hideTranscript()
-    }
-
-    private func setProcessingState() {
-        statusLabel.text = "Thinking..."
-        instructionLabel.text = "Processing your message"
-        conversationOrb.setState(.processing)
-    }
-
-    private func setSpeakingState() {
-        statusLabel.text = "Iris is speaking"
-        instructionLabel.text = "You can interrupt at any time"
-        conversationOrb.setState(.speaking)
-    }
-
-    private func setPausedState() {
-        statusLabel.text = "Paused"
-        instructionLabel.text = "Tap to continue"
-        conversationOrb.setState(.idle)
-    }
-
-    private func showTranscript(_ text: String) {
-        transcriptLabel.text = text
-        UIView.animate(withDuration: 0.3) {
-            self.transcriptLabel.alpha = 1.0
-        }
-    }
-
-    private func hideTranscript() {
-        UIView.animate(withDuration: 0.3) {
-            self.transcriptLabel.alpha = 0.0
-        }
-    }
-
     // MARK: - Actions
     @objc private func closeButtonTapped() {
-        stopVoiceConversation()
-        delegate?.voiceConversationDidCancel()
-        dismiss(animated: true)
-    }
+        voiceManager.stopConversation()
 
-    @objc private func orbTapped() {
-        // Manual trigger for listening if in idle state
-        if currentState == .idle {
-            startListening()
+        // Pass conversation history back to delegate
+        let messages = voiceManager.messages.map { ($0.text, $0.isFromUser) }
+        if !messages.isEmpty {
+            delegate?.voiceConversationDidFinish(messages: messages)
+        } else {
+            delegate?.voiceConversationDidCancel()
         }
+
+        dismiss(animated: true)
     }
 
     private func showPermissionError() {
@@ -418,154 +217,124 @@ class VoiceConversationViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    // MARK: - AI Conversation
-    private func processVoiceMessage(audioData: Data) {
-        // Transcribe audio
-        OpenAIService.shared.transcribeAudio(audioData: audioData) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let transcript):
-                    self?.handleTranscript(transcript)
-                case .failure(let error):
-                    self?.handleError("Failed to transcribe: \(error.localizedDescription)")
-                }
+    // MARK: - Transcript UI
+    private func addTranscriptMessage(_ message: ConversationMessage) {
+        let messageView = createTranscriptMessageView(message)
+        transcriptStackView.addArrangedSubview(messageView)
+
+        // Show transcript if hidden
+        if transcriptScrollView.alpha == 0 {
+            UIView.animate(withDuration: 0.3) {
+                self.transcriptScrollView.alpha = 1.0
             }
         }
-    }
 
-    private func handleTranscript(_ transcript: String) {
-        // Add to conversation history
-        conversationMessages.append((text: transcript, isFromUser: true))
-
-        // Show transcript briefly
-        showTranscript("You: \(transcript)")
-
-        // Send to ChatGPT
-        OpenAIService.shared.sendMessage(transcript) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let response):
-                    self?.generateVoiceResponse(response)
-                case .failure(let error):
-                    self?.handleError("AI response failed: \(error.localizedDescription)")
-                }
-            }
+        // Scroll to bottom
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let bottomOffset = CGPoint(x: 0, y: max(0, self.transcriptScrollView.contentSize.height - self.transcriptScrollView.bounds.height))
+            self.transcriptScrollView.setContentOffset(bottomOffset, animated: true)
         }
     }
 
-    private func generateVoiceResponse(_ text: String) {
-        // Add to conversation history
-        conversationMessages.append((text: text, isFromUser: false))
+    private func createTranscriptMessageView(_ message: ConversationMessage) -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
 
-        // Show AI response text
-        showTranscript("Iris: \(text)")
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 14, weight: message.isFromUser ? .medium : .regular)
+        label.textColor = message.isFromUser ? UIColor.white : UIColor.white.withAlphaComponent(0.8)
+        label.numberOfLines = 0
 
-        // Convert to speech
-        OpenAIService.shared.textToSpeech(text: text) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let audioData):
-                    self?.playAIResponse(audioData)
-                case .failure(let error):
-                    // Fallback to text display only
-                    self?.handleError("Voice synthesis failed: \(error.localizedDescription)")
-                    self?.returnToListening()
-                }
-            }
-        }
-    }
+        let prefix = message.isFromUser ? "You: " : "Iris: "
+        label.text = prefix + message.text
 
-    private func playAIResponse(_ audioData: Data) {
-        currentState = .speaking
-        disableVoiceDetection() // Prevent echo/feedback during AI speech
-        VoiceService.shared.playAudio(data: audioData)
-    }
+        container.addSubview(label)
 
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: container.topAnchor),
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
 
-    private func returnToListening() {
-        isFirstMessage = false
-        currentState = .idle
-
-        // Ensure VAD is still running for continuous conversation
-        if vadTimer == nil {
-            startVoiceActivityDetection()
-        }
-
-        // Re-enable voice detection after recovery delay
-        enableVoiceDetectionWithDelay()
-
-        // Hide transcript after a delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.hideTranscript()
-        }
-    }
-
-    private func handleError(_ message: String) {
-        print("Voice Conversation Error: \(message)")
-        showTranscript("Error: \(message)")
-
-        // Re-enable voice detection in case error occurred during AI speech
-        enableVoiceDetectionWithDelay()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.returnToListening()
-        }
-    }
-
-    // MARK: - Voice Detection Control
-    private func disableVoiceDetection() {
-        voiceDetectionEnabled = false
-        silenceStartTime = nil // Reset any ongoing silence timing
-        recoveryTimer?.invalidate()
-        recoveryTimer = nil
-    }
-
-    private func enableVoiceDetectionWithDelay() {
-        recoveryTimer?.invalidate()
-        recoveryTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { [weak self] _ in
-            self?.voiceDetectionEnabled = true
-            self?.silenceStartTime = nil
-        }
-    }
-
-    deinit {
-        stopVoiceConversation()
-        recoveryTimer?.invalidate()
+        return container
     }
 }
 
-// MARK: - VoiceServiceDelegate
-extension VoiceConversationViewController: VoiceServiceDelegate {
-    func voiceServiceDidStartRecording() {
-        // Recording started
-    }
+// MARK: - VoiceConversationManagerDelegate
+extension VoiceConversationViewController: VoiceConversationManagerDelegate {
 
-    func voiceServiceDidStopRecording() {
-        // Recording stopped
-    }
-
-    func voiceServiceDidFinishRecording(audioData: Data?, success: Bool) {
-        if success, let audioData = audioData {
-            processVoiceMessage(audioData: audioData)
-        } else {
-            handleError("Recording failed")
+    func voiceManager(_ manager: VoiceConversationManager, didChangeState state: ConversationState) {
+        DispatchQueue.main.async {
+            self.updateUIForState(state)
         }
     }
 
-    func voiceServiceDidStartPlaying() {
-        currentState = .speaking
-        disableVoiceDetection() // Extra safety - disable detection during playback
+    func voiceManager(_ manager: VoiceConversationManager, didDetectSpeech energy: Float) {
+        // Update orb visualization with audio level
+        DispatchQueue.main.async {
+            // Convert dB to 0-1 range for visualization
+            let normalizedEnergy = max(0, min(1, (energy + 60) / 60)) // -60dB to 0dB mapped to 0-1
+            self.conversationOrb.updateAudioLevel(normalizedEnergy)
+        }
     }
 
-    func voiceServiceDidFinishPlaying() {
-        returnToListening()
+    func voiceManager(_ manager: VoiceConversationManager, didAddMessage message: ConversationMessage) {
+        DispatchQueue.main.async {
+            self.addTranscriptMessage(message)
+        }
     }
 
-    func voiceServiceRecordingTimeDidUpdate(_ time: TimeInterval) {
-        // Update UI if needed
+    func voiceManager(_ manager: VoiceConversationManager, didEncounterError error: Error) {
+        DispatchQueue.main.async {
+            print("Voice conversation error: \(error.localizedDescription)")
+            self.showError(error.localizedDescription)
+        }
     }
 
-    func voiceServiceDidFailWithError(_ error: Error) {
-        handleError(error.localizedDescription)
+    func voiceManager(_ manager: VoiceConversationManager, didUpdateTranscription text: String) {
+        // Optionally show live transcription
+        print("Transcription: \(text)")
+    }
+
+    // MARK: - UI State Updates
+    private func updateUIForState(_ state: ConversationState) {
+        switch state {
+        case .idle:
+            statusLabel.text = voiceManager.messages.isEmpty ? "Ready to listen" : "I'm listening..."
+            instructionLabel.text = "Just start speaking naturally"
+            conversationOrb.setState(.idle)
+
+        case .listening:
+            statusLabel.text = "Listening..."
+            instructionLabel.text = "Pause for 1.5 seconds when done"
+            conversationOrb.setState(.listening)
+
+        case .processing:
+            statusLabel.text = "Thinking..."
+            instructionLabel.text = "Processing your message"
+            conversationOrb.setState(.processing)
+
+        case .speaking:
+            statusLabel.text = "Iris is speaking"
+            instructionLabel.text = "You can interrupt by speaking"
+            conversationOrb.setState(.speaking)
+
+        case .interrupted:
+            statusLabel.text = "Listening..."
+            instructionLabel.text = "You interrupted - keep going"
+            conversationOrb.setState(.listening)
+        }
+    }
+
+    private func showError(_ message: String) {
+        statusLabel.text = "Error"
+        instructionLabel.text = message
+
+        // Return to idle after showing error
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.updateUIForState(.idle)
+        }
     }
 }
